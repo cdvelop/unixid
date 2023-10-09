@@ -1,7 +1,6 @@
 package unixid
 
 import (
-	"github.com/cdvelop/input"
 	"github.com/cdvelop/model"
 )
 
@@ -12,11 +11,6 @@ func InputPK(options ...string) *model.Input {
 
 	in := pk{
 		show: false,
-		Permitted: input.Permitted{
-			Numbers: true,
-			Minimum: 1,
-			Maximum: 20,
-		},
 	}
 
 	for _, opt := range options {
@@ -35,7 +29,6 @@ func InputPK(options ...string) *model.Input {
 
 type pk struct {
 	show bool
-	input.Permitted
 }
 
 func (p pk) Name() string {
@@ -62,7 +55,7 @@ func (p pk) HtmlTag(id, field_name string, allow_skip_completed bool) string {
 
 func (p pk) GoodTestData() (out []string) {
 
-	temp := []string{
+	return []string{
 		"56988765432",
 		"1234567",
 		"0",
@@ -79,14 +72,6 @@ func (p pk) GoodTestData() (out []string) {
 		"823456789",
 		"29",
 	}
-
-	for _, v := range temp {
-		if len(v) >= p.Minimum && len(v) <= p.Maximum {
-			out = append(out, v)
-		}
-	}
-
-	return
 }
 
 func (p pk) WrongTestData() (out []string) {

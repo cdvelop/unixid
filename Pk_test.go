@@ -15,14 +15,16 @@ var (
 		skip_validation bool
 		expected        string
 	}{
-		"id 1 correcto?":                 {"1624397134562544800", false, ""},
-		"id 2 ok?":                       {"1624397172303448900", false, ""},
-		"id 3 ok?":                       {"1634394443466878800", false, ""},
-		"numero 5 correcto?":             {"5", false, ""},
-		"numero 45 correcto?":            {"45", false, ""},
-		"id con letra valido?":           {"E624397172303448900", false, "E no es un numero"},
-		"primary key se permite vació ?": {"", false, "tamaño mínimo 1 caracteres"},
-		"id cero?":                       {"0", false, ""},
+		"id 1 correcto?":                   {"1624397134562544800", false, ""},
+		"id 2 ok?":                         {"1624397172303448900", false, ""},
+		"id 3 ok?":                         {"1634394443466878800", false, ""},
+		"id 4 con punto usuario numero ok": {"1624397134562544800.30", false, ""},
+		"id 5 con - usuario numero error":  {"1624397134562544800-30", false, "error id contiene caracteres no válidos"},
+		"numero 5 correcto?":               {"5", false, ""},
+		"numero 45 correcto?":              {"45", false, ""},
+		"id con letra valido?":             {"E624397172303448900", false, "error id contiene caracteres no válidos"},
+		"primary key se permite vació ?":   {"", false, "error id contiene caracteres no válidos"},
+		"id cero?":                         {"0", false, ""},
 	}
 )
 

@@ -1,20 +1,30 @@
 package unixid_test
 
 import (
+	"log"
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/cdvelop/unixid"
 )
+
+type timeHandler struct{}
+
+func (timeHandler) UnixNano() int64 {
+	return time.Now().UnixNano()
+}
 
 func Test_GetNewID(t *testing.T) {
 	idRequired := 1000
 	wg := sync.WaitGroup{}
 	wg.Add(idRequired)
 
-	// PG := sqlite.NewConnection("test.PG", false)
-
-	uid := unixid.NewHandler()
+	lock_handler := sync.Mutex{}
+	uid, err := unixid.NewHandler(timeHandler{}, &lock_handler, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	idObtained := make(map[string]int)
 	var esperar sync.Mutex
@@ -38,6 +48,7 @@ func Test_GetNewID(t *testing.T) {
 	// fmt.Printf("total id requeridos: %v ob: %v\n", idRequired, len(idObtained))
 	// fmt.Printf("%v", idObtained)
 	if idRequired != len(idObtained) {
+		t.Fatal("se esperaban:", idRequired, " ids pero se obtuvieron:", len(idObtained))
 		t.Fail()
 	}
 }
