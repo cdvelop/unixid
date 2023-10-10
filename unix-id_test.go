@@ -4,24 +4,17 @@ import (
 	"log"
 	"sync"
 	"testing"
-	"time"
 
+	"github.com/cdvelop/timeserver"
 	"github.com/cdvelop/unixid"
 )
-
-type timeHandler struct{}
-
-func (timeHandler) UnixNano() int64 {
-	return time.Now().UnixNano()
-}
 
 func Test_GetNewID(t *testing.T) {
 	idRequired := 1000
 	wg := sync.WaitGroup{}
 	wg.Add(idRequired)
 
-	lock_handler := sync.Mutex{}
-	uid, err := unixid.NewHandler(timeHandler{}, &lock_handler, nil)
+	uid, err := unixid.NewHandler(timeserver.TimeServer{}, &sync.Mutex{}, nil)
 	if err != nil {
 		log.Fatal(err)
 	}
