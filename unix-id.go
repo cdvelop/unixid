@@ -24,5 +24,11 @@ func (id *UnixID) GetNewID() string {
 	// log.Printf("unix time maps %v", setting.lastUnixIDatabase)
 	id.lastUnixIDatabase = idunix //actualizo id
 	id.lockHandler.Unlock()
-	return idunix + "." + id.user.UserAuthNumber()
+
+	user_num := id.user.UserAuthNumber()
+	if user_num != "" {
+		idunix += "." + user_num
+	}
+
+	return idunix
 }

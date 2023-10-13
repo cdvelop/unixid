@@ -1,6 +1,6 @@
 package unixid
 
-// always return 0
+// always return ""
 func (defaultAuthNumber) UserAuthNumber() string {
-	return "0"
+	return ""
 }

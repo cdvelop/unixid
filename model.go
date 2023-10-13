@@ -20,5 +20,5 @@ type UnixID struct {
 	user model.UserAuthNumber
 }
 
-// always return 0
+// always return ""
 type defaultAuthNumber struct{}
