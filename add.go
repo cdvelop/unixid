@@ -5,7 +5,7 @@ import "github.com/cdvelop/model"
 // unixTimeHandler ej: time.Now() = UnixNano() int64
 // lockHandler ej: sync.Mutex{} = Lock() Unlock()
 // UserAuthNumber ej: UserAuthNumber() string = 1,4,4000 .... if nil, always return 0.. id ej: 124663.0
-func NewHandler(t unixTimeHandler, l lockHandler, u model.UserAuthNumber) (*UnixID, error) {
+func NewHandler(t model.UnixTimeHandler, l lockHandler, u model.UserAuthNumber) (*UnixID, error) {
 
 	if t == nil {
 		return nil, model.Error("debes ingresar un tipo de Manejador de tiempo que retorne el método UnixNano() int64")
@@ -26,7 +26,7 @@ func NewHandler(t unixTimeHandler, l lockHandler, u model.UserAuthNumber) (*Unix
 	idh := UnixID{
 		lastUnixIDatabase: "",
 		lockHandler:       l,
-		unixTimeHandler:   t,
+		UnixTimeHandler:   t,
 		user:              uan,
 	}
 

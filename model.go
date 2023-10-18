@@ -8,15 +8,10 @@ type lockHandler interface {
 	Unlock()
 }
 
-// ej: time.Now()
-type unixTimeHandler interface {
-	UnixNano() int64
-}
-
 type UnixID struct {
 	lastUnixIDatabase string
 	lockHandler
-	unixTimeHandler
+	model.UnixTimeHandler
 	user model.UserAuthNumber
 }
 

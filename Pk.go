@@ -32,7 +32,7 @@ type pk struct {
 }
 
 func (p pk) Name() string {
-	return "Pk"
+	return "InputPK"
 }
 
 func (p pk) HtmlName() string {
