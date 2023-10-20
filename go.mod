@@ -3,7 +3,7 @@ module github.com/cdvelop/unixid
 go 1.20
 
 require (
-	github.com/cdvelop/model v0.0.56
+	github.com/cdvelop/model v0.0.58
 	github.com/cdvelop/timeserver v0.0.1
 )
 
