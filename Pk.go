@@ -50,7 +50,7 @@ func (p pk) HtmlTag(id, field_name string, allow_skip_completed bool) string {
 	}
 	// p.Number.HtmlTag.HtmlTag()
 	// return p.BuildHtmlTag(p.HtmlName(), p.Name(), id, field_name, true)
-	return `<input type="` + p.HtmlName() + `" id="` + id + `" name="` + field_name + `" data-name="` + p.Name() + `"` + required + `>`
+	return `<input type="` + p.HtmlName() + `" id="` + id + `" name="` + field_name + `" data-name="` + p.Name() + `" value=""` + required + `>`
 }
 
 func (p pk) GoodTestData() (out []string) {
