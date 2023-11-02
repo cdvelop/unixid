@@ -47,7 +47,7 @@ func Test_InputPrimaryKey(t *testing.T) {
 }
 
 func Test_TagPrimaryKey(t *testing.T) {
-	tag := modelPrimaryKey.Tag.HtmlTag("1", "name", true)
+	tag := modelPrimaryKey.Tag.BuildContainerView("1", "name", true)
 	if tag == "" {
 		log.Fatalln("ERROR NO TAG RENDERING ")
 	}

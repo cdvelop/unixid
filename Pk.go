@@ -43,12 +43,12 @@ func (p pk) HtmlName() string {
 }
 
 // representación
-func (p pk) HtmlTag(id, field_name string, allow_skip_completed bool) string {
+func (p pk) BuildContainerView(id, field_name string, allow_skip_completed bool) string {
 	var required string
 	if !allow_skip_completed {
 		required = ` required`
 	}
-	// p.Number.HtmlTag.HtmlTag()
+	// p.Number.BuildContainerView.BuildContainerView()
 	// return p.BuildHtmlTag(p.HtmlName(), p.Name(), id, field_name, true)
 	return `<input type="` + p.HtmlName() + `" id="` + id + `" name="` + field_name + `" data-name="` + p.Name() + `" value=""` + required + `>`
 }
