@@ -1,6 +1,6 @@
 package unixid
 
 // always return ""
-func (defaultAuthNumber) UserAuthNumber() (string, error) {
-	return "", nil
+func (defaultAuthNumber) UserAuthNumber() (num, err string) {
+	return "", ""
 }

@@ -26,7 +26,7 @@ func (id *UnixID) GetNewID() string {
 	id.lockHandler.Unlock()
 
 	user_num, err := id.user.UserAuthNumber()
-	if user_num != "" && err == nil {
+	if user_num != "" && err == "" {
 		idunix += "." + user_num
 	}
 

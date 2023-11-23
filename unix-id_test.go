@@ -1,7 +1,6 @@
 package unixid_test
 
 import (
-	"log"
 	"sync"
 	"testing"
 
@@ -15,8 +14,9 @@ func Test_GetNewID(t *testing.T) {
 	wg.Add(idRequired)
 
 	uid, err := unixid.NewHandler(timeserver.TimeServer{}, &sync.Mutex{}, nil)
-	if err != nil {
-		log.Fatal(err)
+	if err != "" {
+		t.Fatal(err)
+		return
 	}
 
 	idObtained := make(map[string]int)

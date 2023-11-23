@@ -2,22 +2,22 @@ package unixid
 
 import (
 	"strconv"
-
-	"github.com/cdvelop/model"
 )
 
-func (pk) ValidateField(data_in string, skip_validation bool, options ...string) error {
+func (pk) ValidateField(data_in string, skip_validation bool, options ...string) (err string) {
 	if !skip_validation {
 
 		_, err := validateID(data_in)
 
 		return err
 	}
-	return nil
+	return ""
 }
 
-func validateID(new_id_in string) (int64, error) {
+func validateID(new_id_in string) (id int64, err string) {
 	var id_out string
+	const this = "validateID error "
+	const msg = "id contiene caracteres no válidos"
 
 	var point_count int
 	var point_index = len(new_id_in)
@@ -26,10 +26,10 @@ func validateID(new_id_in string) (int64, error) {
 			point_count++
 			point_index = i
 			if point_count > 1 {
-				return 0, model.Error("error id contiene más de un punto")
+				return 0, this + "id contiene más de un punto"
 			}
 		} else if char < '0' || char > '9' {
-			return 0, model.Error("error id contiene caracteres no válidos")
+			return 0, this + msg
 		}
 	}
 
@@ -37,10 +37,10 @@ func validateID(new_id_in string) (int64, error) {
 
 	// fmt.Println("ID SALIDA:", id_out)
 
-	id, err := strconv.ParseInt(id_out, 10, 64)
-	if err != nil {
-		return 0, model.Error("error id contiene caracteres no válidos")
+	id, e := strconv.ParseInt(id_out, 10, 64)
+	if e != nil {
+		return 0, this + msg
 	}
 
-	return id, nil
+	return id, ""
 }

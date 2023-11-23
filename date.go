@@ -5,11 +5,11 @@ import (
 )
 
 // ej: 1123466.42 = 2006-01-02 15:04
-func UnixNanoToStringDate(unixNanoStr string) (string, error) {
+func UnixNanoToStringDate(unixNanoStr string) (date, err string) {
 
-	unixNano, err := validateID(unixNanoStr)
-	if err != nil {
-		return "", err
+	unixNano, er := validateID(unixNanoStr)
+	if er != "" {
+		return "", er
 	}
 
 	// Convierte el Unixtime en segundos
@@ -21,7 +21,7 @@ func UnixNanoToStringDate(unixNanoStr string) (string, error) {
 	// Formatea la fecha en el formato deseado
 	formattedTime := t.Format("2006-01-02 15:04")
 
-	return formattedTime, nil
+	return formattedTime, ""
 }
 
 // https://chat.openai.com/c/4af98def-f8d9-4095-bf31-deaaad84c094
