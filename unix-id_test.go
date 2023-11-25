@@ -13,7 +13,7 @@ func Test_GetNewID(t *testing.T) {
 	wg := sync.WaitGroup{}
 	wg.Add(idRequired)
 
-	uid, err := unixid.NewHandler(timeserver.TimeServer{}, &sync.Mutex{}, nil)
+	uid, err := unixid.NewHandler(timeserver.Add(), &sync.Mutex{}, nil)
 	if err != "" {
 		t.Fatal(err)
 		return
