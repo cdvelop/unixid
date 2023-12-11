@@ -3,13 +3,13 @@ module github.com/cdvelop/unixid
 go 1.20
 
 require (
-	github.com/cdvelop/model v0.0.77
-	github.com/cdvelop/timeserver v0.0.25
+	github.com/cdvelop/model v0.0.78
+	github.com/cdvelop/timeserver v0.0.26
 )
 
 require (
-	github.com/cdvelop/strings v0.0.7 // indirect
-	github.com/cdvelop/timetools v0.0.26 // indirect
+	github.com/cdvelop/strings v0.0.8 // indirect
+	github.com/cdvelop/timetools v0.0.28 // indirect
 )
 
 replace github.com/cdvelop/model => ../model
