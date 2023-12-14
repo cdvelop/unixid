@@ -25,7 +25,12 @@ func Test_GetNewID(t *testing.T) {
 	for i := 0; i < idRequired; i++ {
 		go func() {
 			defer wg.Done()
-			id := uid.GetNewID()
+			id, err := uid.GetNewID()
+			if err != "" {
+				t.Log(err)
+				wg.Done()
+				return
+			}
 			esperar.Lock()
 			if cantId, exist := idObtained[id]; exist {
 				idObtained[id] = cantId + 1

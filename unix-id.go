@@ -5,7 +5,7 @@ import (
 )
 
 // GetNewID retorna un id único para el ingreso a la base de datos tipo unix time
-func (id *UnixID) GetNewID() string {
+func (id *UnixID) GetNewID() (new_id, err string) {
 	id.lockHandler.Lock()
 	idunix := strconv.FormatInt(id.UnixNano(), 10)
 
@@ -30,5 +30,5 @@ func (id *UnixID) GetNewID() string {
 		idunix += "." + user_num
 	}
 
-	return idunix
+	return idunix, err
 }
