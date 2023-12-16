@@ -12,7 +12,7 @@ type UnixID struct {
 	lastUnixIDatabase string
 	lockHandler
 	model.UnixTimeHandler
-	user model.UserAuthNumber
+	user model.UserSessionNumber
 }
 
 // always return ""

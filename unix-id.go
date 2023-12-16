@@ -25,7 +25,7 @@ func (id *UnixID) GetNewID() (new_id, err string) {
 	id.lastUnixIDatabase = idunix //actualizo id
 	id.lockHandler.Unlock()
 
-	user_num, err := id.user.UserAuthNumber()
+	user_num, err := id.user.UserSessionNumber()
 	if user_num != "" && err == "" {
 		idunix += "." + user_num
 	}
