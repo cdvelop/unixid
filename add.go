@@ -15,19 +15,15 @@ func NewHandler(t model.UnixTimeHandler, l lockHandler, u model.UserSessionNumbe
 		return nil, "debes ingresar un tipo de Manejador de protección de escritura con los métodos: Lock() Unlock() ej sync.Mutex{}"
 	}
 
-	var uan model.UserSessionNumber
-
-	if u != nil {
-		uan = u
-	} else {
-		uan = defaultAuthNumber{}
+	if u == nil {
+		return nil, "debes ingresar un  Manejador UserSessionNumber valido"
 	}
 
 	idh := UnixID{
 		lastUnixIDatabase: "",
 		lockHandler:       l,
 		UnixTimeHandler:   t,
-		user:              uan,
+		user:              u,
 	}
 
 	return &idh, ""
