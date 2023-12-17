@@ -8,20 +8,12 @@ import (
 	"github.com/cdvelop/unixid"
 )
 
-// always return "1"
-type defaultAuthNumber struct{}
-
-// always return ""
-func (defaultAuthNumber) UserSessionNumber() (num, err string) {
-	return "1", ""
-}
-
 func Test_GetNewID(t *testing.T) {
 	idRequired := 1000
 	wg := sync.WaitGroup{}
 	wg.Add(idRequired)
 
-	uid, err := unixid.NewHandler(timeserver.Add(), &sync.Mutex{}, defaultAuthNumber{})
+	uid, err := unixid.NewHandler(timeserver.Add(), &sync.Mutex{}, unixid.NoSessionNumber{})
 	if err != "" {
 		t.Fatal(err)
 		return
