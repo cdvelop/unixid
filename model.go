@@ -14,6 +14,3 @@ type UnixID struct {
 	model.UnixTimeHandler
 	user model.UserSessionNumber
 }
-
-// always return ""
-type defaultAuthNumber struct{}
