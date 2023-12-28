@@ -1,6 +1,6 @@
 github.com/cdvelop/strings v0.0.9 h1:yDh2msl3EQja0dHw+oOHfD9ymQMa50KakKTkjsXDnvw=
 github.com/cdvelop/strings v0.0.9/go.mod h1:zNexDeXHRETbMmlmNThQeM7ksRsvzrphsCfwuSxaURk=
-github.com/cdvelop/timeserver v0.0.31 h1:+Yt1ydpmtNDMJbFu29hcnmkwtK+BW+gBQyhbVVAvnHg=
-github.com/cdvelop/timeserver v0.0.31/go.mod h1:SlkQhKGvIxBfAlLDB3biA3JXbrvRRxwv28hyvfVMz0s=
-github.com/cdvelop/timetools v0.0.32 h1:tQPO4BwrEBrIGVMZHhsoYYeu8UXyF6hicm/Q54SET6k=
-github.com/cdvelop/timetools v0.0.32/go.mod h1:Y6C9bgqYnwI+WUuIiJs5VlfyNdVPsCN+42LxUB1S2yo=
+github.com/cdvelop/timeserver v0.0.32 h1:11K2TVGBPGfytpCeV4LP/KalLV+E0l6EBI9tijRXtYM=
+github.com/cdvelop/timeserver v0.0.32/go.mod h1:OT+6GJ8BYH6nbRVjhg8sK2kqJkaOK9sjpZ7aMCBBUpM=
+github.com/cdvelop/timetools v0.0.34 h1:i0xGl3TWul20Mjfo9Al6syclVmhQcitQRsKWdETQkx4=
+github.com/cdvelop/timetools v0.0.34/go.mod h1:1OBRkG90bPLQlfG4YYOWp10aa0xlYN+qQ0tBso/EsBo=
