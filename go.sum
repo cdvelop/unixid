@@ -1,4 +1,4 @@
-github.com/cdvelop/timeserver v0.0.34 h1:phdWri+m4x0ntLIG1fXTrUR7ttrxcIP/ZktwdRMMqhE=
-github.com/cdvelop/timeserver v0.0.34/go.mod h1:MMk1OyqzULSOZrpvbldsxVNMheAgT78oWJSVP98RMX8=
-github.com/cdvelop/timetools v0.0.40 h1:949ornmesdtHGRT8swLCdIJfgCaiB5gcmaKOHzBMFLE=
-github.com/cdvelop/timetools v0.0.40/go.mod h1:FLXt6dvkY4x3rjgRYX7J5XK2H6aHIdxV+fBA+Apj7J8=
+github.com/cdvelop/timeserver v0.0.35 h1:ZyZoTsRsOtwvu3XkRxG1FF0UDkgMmuerhGdcoRxYz0Q=
+github.com/cdvelop/timeserver v0.0.35/go.mod h1:3RO6SrXqP7CRXgGhVWjYYIlXMidbwYPSQGQojz28lRM=
+github.com/cdvelop/timetools v0.0.41 h1:Ods7EohmF78yEuicFKhLT5GpiYJKdqqvsesinsvDJio=
+github.com/cdvelop/timetools v0.0.41/go.mod h1:FLXt6dvkY4x3rjgRYX7J5XK2H6aHIdxV+fBA+Apj7J8=

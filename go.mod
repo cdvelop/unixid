@@ -4,9 +4,9 @@ go 1.20
 
 require (
 	github.com/cdvelop/model v0.0.119
-	github.com/cdvelop/timeserver v0.0.34
+	github.com/cdvelop/timeserver v0.0.35
 )
 
-require github.com/cdvelop/timetools v0.0.40 // indirect
+require github.com/cdvelop/timetools v0.0.41 // indirect
 
 replace github.com/cdvelop/model => ../model
