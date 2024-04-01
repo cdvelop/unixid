@@ -2,33 +2,70 @@ package unixid
 
 import (
 	"strconv"
+	"unsafe"
 )
 
-// GetNewID retorna un id único para el ingreso a la base de datos tipo unix time
-func (id *UnixID) GetNewID() (new_id, err string) {
-	id.lockHandler.Lock()
-	idunix := strconv.FormatInt(id.UnixNano(), 10)
+func (id *UnixID) unixIdNano() string {
 
-	// fmt.Println("ID OBTENIDO:", idunix)
+	currentUnixNano := id.timeNano.UnixNano()
 
-	for {
-		// si no esta el id lo agregamos
-		if id.lastUnixIDatabase != idunix { //last id unix time
-			break
-		} else {
-			//obtenemos nueva marca
-			idunix = strconv.FormatInt(id.UnixNano(), 10)
-			// log.Printf(">>>new time id slow %v ", idunix)
-		}
+	if currentUnixNano == id.lastUnixNano {
+		//mientras sean iguales sumar numero correlativo
+		id.correlativeNumber++
+	} else {
+		id.correlativeNumber = 0
 	}
-	// log.Printf("unix time maps %v", setting.lastUnixIDatabase)
-	id.lastUnixIDatabase = idunix //actualizo id
-	id.lockHandler.Unlock()
+	// actualizo la variable unix nano
+	id.lastUnixNano = currentUnixNano
 
-	user_num, err := id.user.UserSessionNumber()
-	if user_num != "" && err == "" {
-		idunix += "." + user_num
-	}
+	currentUnixNano += id.correlativeNumber
 
-	return idunix, err
+	return strconv.FormatInt(currentUnixNano, 10)
+
 }
+func (id *UnixID) unixIdNanoLAB() string {
+
+	currentUnixNano := id.timeNano.UnixNano()
+
+	if currentUnixNano == id.lastUnixNano {
+		//mientras sean iguales sumar numero correlativo
+		id.correlativeNumber++
+	} else {
+		id.correlativeNumber = 0
+	}
+	// actualizo la variable unix nano
+	id.lastUnixNano = currentUnixNano
+
+	currentUnixNano += id.correlativeNumber
+
+	id.buf = id.buf[:0]
+
+	// fmt.Println("size buffer:", sizeBuf)
+
+	id.buf = strconv.AppendInt(id.buf, currentUnixNano, 10)
+	// id.buf = strconv.AppendUint(id.buf, currentUnixNano, 10)
+
+	// fmt.Println("tmpBuf:", id.buf, "size id buffer:", len(id.buf))
+
+	// return string(id.buf)
+	return *(*string)(unsafe.Pointer(&id.buf))
+	// return unsafe.String(unsafe.SliceData(id.buf), len(id.buf))
+}
+
+// v := int64(42)
+// b := unsafe.Slice((*byte)(unsafe.Pointer(&v)), unsafe.Sizeof(v))
+// fmt.Println(b, "id:", string(b))
+
+// b := *(*[]byte)(unsafe.Pointer(&v)) // Cast directly to a []byte pointer
+// fmt.Println(b, "id:", string(b))    // Output: [42 0 0 0 0 0 0 0] id: *
+
+// buf := unsafe.Slice((*byte)(unsafe.Pointer(&currentUnixNano)), unsafe.Sizeof(currentUnixNano))
+
+// fmt.Println("id:", string(buf))
+
+// return unsafe.String(unsafe.SliceData(buf), len(buf))
+// t := time.Now().UTC().UnixNano()
+//     b := unsafe.Slice((*byte)(unsafe.Pointer(&t)), unsafe.Sizeof(t))
+//     fmt.Println(b)
+
+// https://stackoverflow.com/questions/76431857/what-is-the-fastest-way-to-convert-int64-to-byte-array

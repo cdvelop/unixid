@@ -1,22 +1,13 @@
 package unixid
 
 import (
+	"errors"
 	"strconv"
 )
 
-func (pk) ValidateField(data_in string, skip_validation bool, options ...string) (err string) {
-	if !skip_validation {
-
-		_, err := validateID(data_in)
-
-		return err
-	}
-	return ""
-}
-
-func validateID(new_id_in string) (id int64, err string) {
+func validateID(new_id_in string) (id int64, err error) {
 	var id_out string
-	const this = "validateID error "
+	const e = "validateID "
 	const msg = "id contiene caracteres no válidos"
 
 	var point_count int
@@ -26,10 +17,10 @@ func validateID(new_id_in string) (id int64, err string) {
 			point_count++
 			point_index = i
 			if point_count > 1 {
-				return 0, this + "id contiene más de un punto"
+				return 0, errors.New(e + "id contiene más de un punto")
 			}
 		} else if char < '0' || char > '9' {
-			return 0, this + msg
+			return 0, errors.New(e + msg)
 		}
 	}
 
@@ -37,10 +28,10 @@ func validateID(new_id_in string) (id int64, err string) {
 
 	// fmt.Println("ID SALIDA:", id_out)
 
-	id, e := strconv.ParseInt(id_out, 10, 64)
-	if e != nil {
-		return 0, this + msg
+	id, er := strconv.ParseInt(id_out, 10, 64)
+	if er != nil {
+		return 0, errors.New(e + msg)
 	}
 
-	return id, ""
+	return id, nil
 }

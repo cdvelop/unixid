@@ -1,15 +1,11 @@
 package unixid
 
-import (
-	"github.com/cdvelop/model"
-)
-
 // Primary key
 // parámetro opcional:
 // "show": el campo se mostrara el usuario por defecto estará oculto
-func InputPK(options ...string) *model.Input {
+func InputPK(options ...string) *pk {
 
-	in := pk{
+	in := &pk{
 		show: false,
 	}
 
@@ -19,12 +15,7 @@ func InputPK(options ...string) *model.Input {
 		}
 	}
 
-	return &model.Input{
-		InputName: in.Name(),
-		Tag:       in,
-		Validate:  in,
-		TestData:  in,
-	}
+	return in
 }
 
 type pk struct {
@@ -51,6 +42,16 @@ func (p pk) BuildContainerView(id, field_name string, allow_skip_completed bool)
 	// p.Number.BuildContainerView.BuildContainerView()
 	// return p.BuildHtmlTag(p.HtmlName(), p.Name(), id, field_name, true)
 	return `<input type="` + p.HtmlName() + `" id="` + id + `" name="` + field_name + `" data-name="` + p.Name() + `" value=""` + required + `>`
+}
+
+func (pk) ValidateField(data_in string, skip_validation bool, options ...string) error {
+	if !skip_validation {
+
+		_, err := validateID(data_in)
+
+		return err
+	}
+	return nil
 }
 
 func (p pk) GoodTestData() (out []string) {

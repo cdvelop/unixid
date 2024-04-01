@@ -2,7 +2,6 @@ package unixid_test
 
 import (
 	"fmt"
-	"log"
 	"testing"
 	"time"
 
@@ -13,6 +12,11 @@ func TestIdToDate(t *testing.T) {
 	now := time.Now()
 	now_nano := now.UnixNano()
 	now_expected := now.Format("2006-01-02 15:04")
+
+	uid, err := unixid.NewHandler()
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	testData := map[string]struct {
 		inputData string
@@ -26,24 +30,23 @@ func TestIdToDate(t *testing.T) {
 		"id 2022-01-19":               {"1643318806368317300", "2022-01-27 18:26"},
 		"id 2022-01-19 con .":         {"1643318806368317300.5", "2022-01-27 18:26"},
 		"id 2023-03-30 con .":         {"1680184020131482400.0", "2023-03-30 10:47"},
-		"error id 2023-03-30 con E":   {"16801E4020131482400.0", "validateID error id contiene caracteres no válidos"},
-		"error id 2023-03-30 con .. ": {"16801840201.31482400.0", "validateID error id contiene más de un punto"},
-		"error sin data de entrada":   {"", "validateID error id contiene caracteres no válidos"},
+		"error id 2023-03-30 con E":   {"16801E4020131482400.0", "validateID id contiene caracteres no válidos"},
+		"error id 2023-03-30 con .. ": {"16801840201.31482400.0", "validateID id contiene más de un punto"},
+		"error sin data de entrada":   {"", "validateID id contiene caracteres no válidos"},
 	}
 
 	for prueba, data := range testData {
 		t.Run((prueba + ": " + data.inputData), func(t *testing.T) {
 
-			resp, err := unixid.UnixNanoToStringDate(data.inputData)
+			resp, err := uid.UnixNanoToStringDate(data.inputData)
 
-			if err != "" {
-				resp = err
+			if err != nil {
+				resp = err.Error()
 			}
 
 			if resp != data.expected {
 				fmt.Println("ERROR prueba:", prueba)
-				fmt.Printf("- [%v] resultado:\n[%v]\n-expectativa:\n[%v]\n\n", data.inputData, resp, data.expected)
-				log.Fatal()
+				t.Fatalf("- [%v] resultado:\n[%v]\n-expectativa:\n[%v]\n\n", data.inputData, resp, data.expected)
 			}
 		})
 	}
