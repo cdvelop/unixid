@@ -19,7 +19,6 @@ type lockHandler interface {
 type UnixID struct {
 	userNum string
 
-	outID        string
 	lastUnixNano int64
 
 	correlativeNumber int64

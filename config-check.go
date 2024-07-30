@@ -18,7 +18,6 @@ func configCheck(c *Config) (*UnixID, error) {
 
 	return &UnixID{
 		userNum:           "",
-		outID:             "",
 		lastUnixNano:      0,
 		correlativeNumber: 0,
 		buf:               make([]byte, 0, sizeBuf),

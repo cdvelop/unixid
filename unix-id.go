@@ -1,9 +1,25 @@
 package unixid
 
 import (
+	"reflect"
 	"strconv"
 	"unsafe"
 )
+
+func (id *UnixID) setValue(rv *reflect.Value, valueOut *string, sizeOut []byte) error {
+
+	*valueOut = id.unixIdNano()
+
+	size := uint8(len(*valueOut))
+
+	sizeOut = append(sizeOut, size)
+
+	// agregamos el id al campo de la estructura origen
+	rv.SetString(*valueOut)
+
+	return nil
+
+}
 
 func (id *UnixID) unixIdNano() string {
 
@@ -23,6 +39,7 @@ func (id *UnixID) unixIdNano() string {
 	return strconv.FormatInt(currentUnixNano, 10)
 
 }
+
 func (id *UnixID) unixIdNanoLAB() string {
 
 	currentUnixNano := id.timeNano.UnixNano()

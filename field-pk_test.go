@@ -23,8 +23,13 @@ func Test_IdpkTABLA(t *testing.T) {
 
 	for testName, dt := range TestData {
 
+		h, err := NewHandler()
+		if err != nil {
+			t.Fatal(err)
+		}
+
 		t.Run((testName), func(t *testing.T) {
-			pk, pk_this_table := IdPkTypeField(dt.fieldName, dt.table_name)
+			pk, pk_this_table := h.FieldType(dt.table_name, dt.fieldName)
 
 			if pk != dt.ExpectedID {
 				t.Fail()
