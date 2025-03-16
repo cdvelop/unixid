@@ -10,7 +10,7 @@ import (
 
 func Test_GetNewID(t *testing.T) {
 	pk := unixid.InputPK()
-	idRequired := 100
+	idRequired := 10000
 	wg := sync.WaitGroup{}
 	wg.Add(idRequired)
 

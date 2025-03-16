@@ -1,6 +1,6 @@
 package unixid
 
-const PrefixNameID = "id_"
+const prefixNameID = "id_"
 
 type unixTimeNano interface {
 	UnixNano() int64

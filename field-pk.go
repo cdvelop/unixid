@@ -21,9 +21,9 @@ func (u *UnixID) FieldType(tableName, fieldName string) (ID, PK bool) {
 		}
 
 		var key_without_id string
-		if strings.Contains(key_name, PrefixNameID) {
+		if strings.Contains(key_name, prefixNameID) {
 
-			key_without_id = strings.Replace(key_name, PrefixNameID, "", 1) //remover _
+			key_without_id = strings.Replace(key_name, prefixNameID, "", 1) //remover _
 		} else {
 
 			key_without_id = key_name[2:] //remover id
