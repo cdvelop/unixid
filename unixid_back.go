@@ -78,3 +78,10 @@ func (timeServer) UnixSecondsToDate(unixSeconds int64) (date string) {
 	// Format the date in the desired format
 	return t.Format("2006-01-02 15:04")
 }
+
+// UnixSecondsToTime converts a Unix timestamp in seconds to a formatted time string.
+// Format: "15:04:05" (hour:minute:second)
+func (timeServer) UnixSecondsToTime(unixSeconds int64) string {
+	t := time.Unix(unixSeconds, 0)
+	return t.Format("15:04:05")
+}

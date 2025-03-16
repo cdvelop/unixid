@@ -89,6 +89,11 @@ The generated IDs follow this format:
 - `GetNewID()`: Generates a new unique ID
 - `UnixNanoToStringDate(unixNanoStr)`: Converts a Unix nanosecond timestamp ID to a human-readable date
 
+### Additional Utility Functions
+
+- `UnixSecondsToTime(unixSeconds int64) string`: Converts a Unix timestamp in seconds to a formatted time string (HH:mm:ss). e.g., `1624397134` -> `15:38:54`
+
+
 ## Validate ID
 
 The `ValidateID` function validates and parses a given ID string. It returns the parsed ID as an `int64` and an error if the ID is invalid.
