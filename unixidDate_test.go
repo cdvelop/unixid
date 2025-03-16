@@ -30,9 +30,9 @@ func TestIdToDate(t *testing.T) {
 		"id 2022-01-19":               {"1643318806368317300", "2022-01-27 18:26"},
 		"id 2022-01-19 con .":         {"1643318806368317300.5", "2022-01-27 18:26"},
 		"id 2023-03-30 con .":         {"1680184020131482400.0", "2023-03-30 10:47"},
-		"error id 2023-03-30 con E":   {"16801E4020131482400.0", "validateID id contiene caracteres no válidos"},
-		"error id 2023-03-30 con .. ": {"16801840201.31482400.0", "validateID id contiene más de un punto"},
-		"error sin data de entrada":   {"", "validateID id contiene caracteres no válidos"},
+		"error id 2023-03-30 con E":   {"16801E4020131482400.0", "ValidateID id contiene caracteres no válidos"},
+		"error id 2023-03-30 con .. ": {"16801840201.31482400.0", "ValidateID id contiene más de un punto"},
+		"error sin data de entrada":   {"", "ValidateID id contiene caracteres no válidos"},
 	}
 
 	for prueba, data := range testData {

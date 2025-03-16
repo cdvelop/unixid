@@ -23,7 +23,7 @@ import "errors"
 func (u *UnixID) UnixNanoToStringDate(unixNanoStr string) (string, error) {
 
 	// Convert string ID to int64 (validating it in the process)
-	unixNano, err := validateID(unixNanoStr)
+	unixNano, err := ValidateID(unixNanoStr)
 	if err != nil {
 		return "", err
 	}

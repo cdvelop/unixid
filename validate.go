@@ -5,9 +5,23 @@ import (
 	"strconv"
 )
 
-func validateID(new_id_in string) (id int64, err error) {
+// ValidateID validates and parses a Unix timestamp ID string.
+// It handles IDs in both server format (just timestamp) and client format (timestamp.userNumber).
+// This function extracts the timestamp portion from the ID and returns it as an int64.
+//
+// Parameters:
+//   - new_id_in: The ID string to validate (e.g., "1624397134562544800" or "1624397134562544800.42")
+//
+// Returns:
+//   - id: The timestamp portion of the ID as an int64 value
+//   - err: An error if the ID format is invalid
+//
+// Validation rules:
+//   - The ID must contain only digits and at most one decimal point
+//   - The timestamp portion (before the decimal point) must be a valid int64
+func ValidateID(new_id_in string) (id int64, err error) {
 	var id_out string
-	const e = "validateID "
+	const e = "ValidateID "
 	const msg = "id contiene caracteres no válidos"
 
 	var point_count int

@@ -4,6 +4,22 @@ import (
 	"strings"
 )
 
+// FieldType determines if a field is an ID field and/or a primary key field.
+// This function analyzes field names to identify ID fields and primary keys based on naming conventions.
+//
+// Parameters:
+//   - tableName: The name of the table or entity that the field belongs to
+//   - fieldName: The name of the field to analyze
+//
+// Returns:
+//   - ID: true if the field is an ID field (starts with "id")
+//   - PK: true if the field is a primary key (is named "id" or matches the pattern "id{tableName}" or "id_{tableName}")
+//
+// Examples:
+//   - FieldType("user", "id") returns (true, true)
+//   - FieldType("user", "iduser") returns (true, true)
+//   - FieldType("user", "id_user") returns (true, true)
+//   - FieldType("user", "idaddress") returns (true, false)
 func (u *UnixID) FieldType(tableName, fieldName string) (ID, PK bool) {
 	if len(fieldName) >= 2 {
 
@@ -23,10 +39,10 @@ func (u *UnixID) FieldType(tableName, fieldName string) (ID, PK bool) {
 		var key_without_id string
 		if strings.Contains(key_name, prefixNameID) {
 
-			key_without_id = strings.Replace(key_name, prefixNameID, "", 1) //remover _
+			key_without_id = strings.Replace(key_name, prefixNameID, "", 1) //remove _
 		} else {
 
-			key_without_id = key_name[2:] //remover id
+			key_without_id = key_name[2:] //remove id
 		}
 
 		if key_without_id == tableName {

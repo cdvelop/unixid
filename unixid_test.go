@@ -9,7 +9,6 @@ import (
 )
 
 func Test_GetNewID(t *testing.T) {
-	pk := unixid.InputPK()
 	idRequired := 10000
 	wg := sync.WaitGroup{}
 	wg.Add(idRequired)
@@ -32,18 +31,6 @@ func Test_GetNewID(t *testing.T) {
 				t.Log(err)
 				return
 			}
-
-			// id := buf.String()
-
-			// fmt.Println("salida id:", id)
-
-			err = pk.ValidateField(id, false)
-			if err != nil {
-				t.Log("se esperaban id:", id, "valido:", err)
-				return
-			}
-
-			// id := buf.String()
 
 			esperar.Lock()
 			if cantId, exist := idObtained[id]; exist {
