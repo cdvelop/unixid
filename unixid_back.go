@@ -5,6 +5,7 @@ package unixid
 
 import (
 	"reflect"
+	"strconv"
 	"sync"
 	"time"
 )
@@ -81,7 +82,28 @@ func (timeServer) UnixSecondsToDate(unixSeconds int64) (date string) {
 
 // UnixSecondsToTime converts a Unix timestamp in seconds to a formatted time string.
 // Format: "15:04:05" (hour:minute:second)
-func (timeServer) UnixSecondsToTime(unixSeconds int64) string {
+// It accepts a parameter of type any and attempts to convert it to an int64 Unix timestamp.
+// eg: 1624397134 -> "15:32:14"
+// supported types: int64, int, float64, string
+func (u UnixID) UnixSecondsToTime(input any) string {
+	var unixSeconds int64
+	switch v := input.(type) {
+	case int64:
+		unixSeconds = v
+	case int:
+		unixSeconds = int64(v)
+	case float64:
+		unixSeconds = int64(v)
+	case string:
+		parsed, err := strconv.ParseInt(v, 10, 64)
+		if err != nil {
+			return ""
+		}
+		unixSeconds = parsed
+	default:
+		return ""
+	}
+
 	t := time.Unix(unixSeconds, 0)
 	return t.Format("15:04:05")
 }

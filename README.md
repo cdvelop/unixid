@@ -91,7 +91,7 @@ The generated IDs follow this format:
 
 ### Additional Utility Functions
 
-- `UnixSecondsToTime(unixSeconds int64) string`: Converts a Unix timestamp in seconds to a formatted time string (HH:mm:ss). e.g., `1624397134` -> `15:38:54`
+- `UnixSecondsToTime(unixSeconds any) string`: Converts a Unix timestamp in seconds to a formatted time string (HH:mm:ss). e.g., `1624397134` -> `15:38:54` supports `int64`, `string`, and `float64` types
 
 
 ## Validate ID
