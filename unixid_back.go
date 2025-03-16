@@ -9,10 +9,10 @@ import (
 	"time"
 )
 
-// NewHandler creates a new UnixID handler for server-side environments.
+// NewUnixID creates a new UnixID handler for server-side environments.
 // This version doesn't require a session handler as user numbers aren't needed in server environments.
 // Returns an initialized UnixID instance ready to generate unique IDs.
-func NewHandler(none ...any) (*UnixID, error) {
+func NewUnixID(none ...any) (*UnixID, error) {
 
 	t := &timeServer{}
 

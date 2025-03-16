@@ -13,7 +13,7 @@ func TestIdToDate(t *testing.T) {
 	now_nano := now.UnixNano()
 	now_expected := now.Format("2006-01-02 15:04")
 
-	uid, err := unixid.NewHandler()
+	uid, err := unixid.NewUnixID()
 	if err != nil {
 		t.Fatal(err)
 	}

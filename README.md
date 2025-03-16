@@ -32,7 +32,7 @@ import (
 
 func main() {
 	// Create a new UnixID handler (server-side)
-	idHandler, err := unixid.NewHandler()
+	idHandler, err := unixid.NewUnixID()
 	if err != nil {
 		panic(err)
 	}
@@ -71,7 +71,7 @@ func (sessionHandler) userSessionNumber() (number string, err error) {
 }
 
 // Create a new UnixID handler with session handler
-idHandler, err := unixid.NewHandler(&sessionHandler{})
+idHandler, err := unixid.NewUnixID(&sessionHandler{})
 ```
 
 ## ID Format
@@ -85,7 +85,7 @@ The generated IDs follow this format:
 
 ### Core Functions
 
-- `NewHandler(...)`: Creates a new UnixID handler for ID generation
+- `NewUnixID(...)`: Creates a new UnixID handler for ID generation
 - `GetNewID()`: Generates a new unique ID
 - `UnixNanoToStringDate(unixNanoStr)`: Converts a Unix nanosecond timestamp ID to a human-readable date
 

@@ -23,7 +23,7 @@ func Test_IdpkTABLA(t *testing.T) {
 
 	for testName, dt := range TestData {
 
-		h, err := NewHandler()
+		h, err := NewUnixID()
 		if err != nil {
 			t.Fatal(err)
 		}

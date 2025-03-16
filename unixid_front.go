@@ -9,7 +9,7 @@ import (
 )
 
 // userSessionNumber() (number string, err error)
-func NewHandler(handlerUserSessionNumber ...any) (*UnixID, error) {
+func NewUnixID(handlerUserSessionNumber ...any) (*UnixID, error) {
 
 	t := timeCLient{}
 

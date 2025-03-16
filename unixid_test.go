@@ -13,7 +13,7 @@ func Test_GetNewID(t *testing.T) {
 	wg := sync.WaitGroup{}
 	wg.Add(idRequired)
 
-	uid, err := unixid.NewHandler()
+	uid, err := unixid.NewUnixID()
 	if err != nil {
 		t.Fatal(err)
 		return
@@ -55,7 +55,7 @@ func Test_GetNewID(t *testing.T) {
 
 func BenchmarkGetNewID(b *testing.B) {
 
-	uid, _ := unixid.NewHandler()
+	uid, _ := unixid.NewUnixID()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 
