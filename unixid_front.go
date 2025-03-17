@@ -8,9 +8,10 @@ import (
 	"syscall/js"
 )
 
-// userSessionNumber() (number string, err error)
-func NewUnixID(handlerUserSessionNumber ...any) (*UnixID, error) {
-
+// createUnixID implementa la función NewUnixID para entornos WebAssembly.
+// Recibe un manejador de sesión de usuario opcional y configura un UnixID para su uso en el cliente.
+// En entornos WebAssembly, se requiere un manejador UserSessionNumber para generar IDs únicos entre sesiones.
+func createUnixID(handlerUserSessionNumber ...any) (*UnixID, error) {
 	t := timeCLient{}
 
 	c := &Config{
@@ -21,7 +22,7 @@ func NewUnixID(handlerUserSessionNumber ...any) (*UnixID, error) {
 	}
 
 	for _, u := range handlerUserSessionNumber {
-		if usNumber, ok := u.(userSessionNumber); ok {
+		if usNumber, ok := u.(UserSessionNumber); ok {
 			c.Session = usNumber
 		}
 	}
@@ -82,13 +83,13 @@ func (id *UnixID) SetValue(rv *reflect.Value, valueOut *string, sizeOut []byte) 
 }
 
 // setUserNumber obtains and caches the user session number.
-// If the user number hasn't been set yet, it calls the userSessionNumber method
+// If the user number hasn't been set yet, it calls the UserSessionNumber method
 // provided in the Config to obtain it.
 // Returns an error if the user session number can't be obtained.
 func (id *UnixID) setUserNumber() (err error) {
 
 	if id.userNum == "" {
-		id.userNum, err = id.Session.userSessionNumber()
+		id.userNum, err = id.Session.UserSessionNumber()
 		if err != nil {
 			return
 		}

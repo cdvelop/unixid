@@ -11,6 +11,7 @@ UnixID provides functionality for generating and managing unique identifiers wit
 - Built-in collision avoidance through sequential numbering
 - Support for both server-side and client-side (WebAssembly) environments
 - Date conversion utilities for timestamp-to-date formatting
+- Smart environment detection for automatic configuration
 
 ## Installation
 
@@ -54,6 +55,13 @@ func main() {
 
 	fmt.Printf("ID timestamp represents: %s\n", dateStr)
 	// Output: ID timestamp represents: 2021-06-23 15:38:54
+
+
+   // convert unix seconds to time
+   timeStr := unixid.UnixSecondsToTime(1624397134)
+   fmt.Printf("Unix seconds to time: %s\n", timeStr)
+   // Output: Unix seconds to time: 15:38:54
+
 }
 ```
 
@@ -65,7 +73,7 @@ For WebAssembly environments, you need to provide a session number handler:
 // Example session handler implementation
 type sessionHandler struct{}
 
-func (sessionHandler) userSessionNumber() (number string, err error) {
+func (sessionHandler) UserSessionNumber() (number string, err error) {
 	// In a real application, this would return the user's session number
 	return "42", nil
 }
@@ -85,8 +93,17 @@ The generated IDs follow this format:
 
 ### Core Functions
 
-- `NewUnixID(...)`: Creates a new UnixID handler for ID generation
+- `NewUnixID(...)`: Creates a new UnixID handler for ID generation with automatic environment detection
+  - In server environments, no parameters are required
+  - In WebAssembly environments, requires a UserSessionNumber implementation
+  - Uses build tags (`wasm` or `!wasm`) to determine the appropriate implementation
+  - Thread-safe in server environments with mutex locking
+  - No mutex in WebAssembly as JavaScript is single-threaded
+
 - `GetNewID()`: Generates a new unique ID
+  - Returns a string representation of the ID
+  - In WebAssembly builds, appends a user session number to the timestamp
+
 - `UnixNanoToStringDate(unixNanoStr)`: Converts a Unix nanosecond timestamp ID to a human-readable date
 
 ### Additional Utility Functions
@@ -119,6 +136,22 @@ func main() {
 	// Output: Parsed ID: 1624397134562544800
 }
 ```
+
+## Environment-Based Configuration
+
+UnixID automatically detects the compilation environment and configures itself appropriately:
+
+- **Server-side (`!wasm` build tag)**: 
+  - Uses Go's standard `time` package
+  - Implements mutex-based thread safety
+  - Generates simple timestamp-based IDs
+
+- **WebAssembly (`wasm` build tag)**:
+  - Uses JavaScript's Date API through `syscall/js`
+  - Requires a session handler to manage user identifiers
+  - Appends a user session number to IDs for cross-client uniqueness
+
+This automatic configuration allows you to use the same API in both environments while the library handles the implementation details internally.
 
 ## Thread Safety
 

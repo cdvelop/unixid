@@ -48,7 +48,7 @@ type UnixID struct {
 // Config holds the configuration and dependencies for a UnixID instance
 type Config struct {
 	// Session provides user session numbers in WebAssembly environments
-	Session userSessionNumber // e.g., userSessionNumber() string = "1","4","4000" etc.
+	Session UserSessionNumber // e.g., UserSessionNumber() string = "1","4","4000" etc.
 
 	// timeNano provides Unix timestamps at nanosecond precision
 	timeNano unixTimeNano // e.g., time.Now().UnixNano()
@@ -58,6 +58,42 @@ type Config struct {
 
 	// syncMutex provides thread safety for concurrent ID generation
 	syncMutex lockHandler // e.g., sync.Mutex{}
+}
+
+// NewUnixID creates a new UnixID handler with appropriate configuration based on the runtime environment.
+//
+// For WebAssembly environments (client-side):
+// - Requires a UserSessionNumber handler to be passed as a parameter
+// - Creates IDs with format: "[timestamp].[user_number]" (e.g., "1624397134562544800.42")
+// - No mutex is used as JavaScript is single-threaded
+//
+// For non-WebAssembly environments (server-side):
+// - Does not require any parameters
+// - Creates IDs with format: "[timestamp]" (e.g., "1624397134562544800")
+// - Uses a sync.Mutex for thread safety
+//
+// Parameters:
+//   - handlerUserSessionNumber: Optional UserSessionNumber implementation (required for WebAssembly)
+//
+// Returns:
+//   - A configured *UnixID instance
+//   - An error if the configuration is invalid
+//
+// Usage examples:
+//
+//	// Server-side usage:
+//	idHandler, err := unixid.NewUnixID()
+//
+//	// WebAssembly usage:
+//	type sessionHandler struct{}
+//	func (sessionHandler) UserSessionNumber() (string, error) { return "42", nil }
+//	idHandler, err := unixid.NewUnixID(&sessionHandler{})
+func NewUnixID(handlerUserSessionNumber ...any) (*UnixID, error) {
+	// The actual implementation is in the build-specific files
+	// This function declaration allows for a unified API
+	// Implementation details are in unixid_front.go and unixid_back.go
+	// and are selected at build time based on the target platform
+	return createUnixID(handlerUserSessionNumber...)
 }
 
 func configCheck(c *Config) (*UnixID, error) {
@@ -83,12 +119,12 @@ func configCheck(c *Config) (*UnixID, error) {
 	}, nil
 }
 
-// userSessionNumber is an interface to obtain the current user's session number
+// UserSessionNumber is an interface to obtain the current user's session number
 // This is primarily used in WebAssembly environments to uniquely identify client sessions
-type userSessionNumber interface {
-	// userSessionNumber returns a unique identifier for the current user session
+type UserSessionNumber interface {
+	// UserSessionNumber returns a unique identifier for the current user session
 	// e.g., "1" or "2" or "34" or "400" etc.
-	userSessionNumber() (number string, err error)
+	UserSessionNumber() (number string, err error)
 }
 
 func (id *UnixID) setValue(rv *reflect.Value, valueOut *string, sizeOut []byte) error {

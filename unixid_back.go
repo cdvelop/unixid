@@ -10,11 +10,10 @@ import (
 	"time"
 )
 
-// NewUnixID creates a new UnixID handler for server-side environments.
-// This version doesn't require a session handler as user numbers aren't needed in server environments.
-// Returns an initialized UnixID instance ready to generate unique IDs.
-func NewUnixID(none ...any) (*UnixID, error) {
-
+// createUnixID implementa la función NewUnixID para entornos no-WebAssembly (servidor).
+// Configura un UnixID para su uso en el servidor con un mutex para sincronización.
+// En entornos de servidor, no se requiere ningún manejador de sesión de usuario.
+func createUnixID(none ...any) (*UnixID, error) {
 	t := &timeServer{}
 
 	c := &Config{
