@@ -4,7 +4,6 @@
 package unixid
 
 import (
-	"reflect"
 	"syscall/js"
 )
 
@@ -54,34 +53,6 @@ func (id *UnixID) GetNewID() string {
 	}
 
 	return outID
-}
-
-// SetValue sets a unique ID value to a struct field using reflection.
-// For WASM environments, the ID includes the user session number as a suffix.
-// Parameters:
-//   - rv: A reflect.Value pointer to the struct field that will receive the ID
-//   - valueOut: A pointer to a string that will store the generated ID
-//   - sizeOut: A byte slice that will track the size of the generated value
-//
-// Note: This function is deprecated. Use SetNewID instead.
-func (id *UnixID) SetValue(rv *reflect.Value, valueOut *string, sizeOut []byte) error {
-	*valueOut = id.unixIdNano()
-
-	if id.userNum == "" {
-		id.userNum = id.Session.userSessionNumber()
-	}
-
-	*valueOut += "."
-	*valueOut += id.userNum
-
-	size := uint8(len(*valueOut))
-
-	sizeOut = append(sizeOut, size)
-
-	// Add the ID to the struct field of the source structure
-	rv.SetString(*valueOut)
-
-	return nil
 }
 
 // setUserNumber function is removed as it's no longer needed
