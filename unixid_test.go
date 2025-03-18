@@ -103,75 +103,60 @@ func TestSequentialIDs(t *testing.T) {
 	if len(uniqueIDs) < len(ids) {
 		t.Fatalf("Se esperaban %d IDs únicos, pero se obtuvieron %d", len(ids), len(uniqueIDs))
 	}
-
 }
 
-// TestExternalMutexUsage verifies that an external mutex can be passed to NewUnixID
-// and that it is correctly used to avoid deadlocks when other libraries also use sync.Mutex
-func TestExternalMutexUsage(t *testing.T) {
-	// We create an external mutex that simulates being shared with another library
+// TestExternalMutexNoDeadlock verifica que cuando se proporciona un mutex externo,
+// la llamada a GetNewID no se bloquee cuando ya hay un lock adquirido con el mismo mutex.
+// Esta prueba verifica el comportamiento actualizado donde se usa un no-op mutex internamente
+// cuando se proporciona un mutex externo para prevenir deadlocks.
+func TestExternalMutexNoDeadlock(t *testing.T) {
+	// Creamos un mutex externo que simula ser compartido con otra biblioteca
 	externalMutex := &sync.Mutex{}
 
-	// We create an instance of UnixID passing the external mutex
+	// Creamos una instancia de UnixID pasando el mutex externo
 	uid, err := unixid.NewUnixID(externalMutex)
 	if err != nil {
-		t.Fatalf("Error creating UnixID with external mutex: %v", err)
+		t.Fatalf("Error creando UnixID con mutex externo: %v", err)
 		return
 	}
 
-	// We simulate a scenario where another library locks the mutex
-	// and then our code uses it
+	// Simulamos un escenario donde otra biblioteca bloquea el mutex
+	// y luego nuestro código lo utiliza
 	externalMutex.Lock()
+	defer externalMutex.Unlock()
 
-	// We use a channel and a goroutine to check that GetNewID
-	// blocks waiting for the external mutex to be released
-	resultChan := make(chan string)
-	timeoutChan := make(chan bool)
-
+	// Definimos un canal para detectar si hay deadlock
+	done := make(chan bool)
 	go func() {
-		// If the mutex is used correctly, this call will block
-		// until we release the external mutex
+		// Esto NO debería bloquearse con la nueva lógica, ya que
+		// internamente estamos usando un defaultNoOpMutex
 		id := uid.GetNewID()
-		resultChan <- id
-	}()
-
-	// We set up a timeout to detect if GetNewID doesn't block when it should
-	go func() {
-		// We wait a bit to ensure the previous goroutine had enough time to start
-		timer := time.NewTimer(time.Millisecond * 100)
-		<-timer.C
-		timeoutChan <- true
-	}()
-
-	// We check if GetNewID blocked correctly waiting for the mutex
-	select {
-	case id := <-resultChan:
-		// If we reach here before the timeout, it means that GetNewID did not wait for the mutex
-		t.Fatalf("GetNewID did not wait for the external mutex. ID obtained: %s", id)
-	case <-timeoutChan:
-		// This is the expected behavior: GetNewID is blocking
-	}
-
-	// We release the external mutex
-	externalMutex.Unlock()
-
-	// Now GetNewID should complete
-	select {
-	case id := <-resultChan:
-		// Expected behavior: an ID is generated after releasing the mutex
 		if id == "" {
-			t.Fatal("Generated an empty ID after releasing the mutex")
+			t.Error("Se generó un ID vacío")
 		}
-	case <-time.After(time.Second):
-		// If we reach here, GetNewID is still blocked even after releasing the external mutex
-		t.Fatal("GetNewID is still blocked after releasing the external mutex")
+		done <- true
+	}()
+
+	// Esperamos brevemente para ver si se completa la generación del ID
+	select {
+	case <-done:
+		// Este es el comportamiento esperado: GetNewID no se bloquea
+		// porque internamente estamos usando un defaultNoOpMutex
+	case <-time.After(time.Millisecond * 500):
+		t.Fatal("GetNewID se bloqueó a pesar de usar un no-op mutex internamente")
 	}
 
-	// Additional test: verify that we can generate several IDs without issues
+	// Verificación adicional: generar varios IDs sin problemas mientras el mutex está bloqueado
+	ids := make(map[string]bool)
 	for i := 0; i < 10; i++ {
 		id := uid.GetNewID()
 		if id == "" {
-			t.Fatalf("Generated an empty ID on iteration %d", i)
+			t.Fatalf("Se generó un ID vacío en la iteración %d", i)
 		}
+
+		if _, exists := ids[id]; exists {
+			t.Fatalf("ID duplicado encontrado: %s", id)
+		}
+		ids[id] = true
 	}
 }

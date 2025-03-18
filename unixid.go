@@ -95,8 +95,10 @@ type Config struct {
 //
 // IMPORTANT: When integrating with other libraries that also use sync.Mutex,
 // you can pass an existing mutex as a parameter to avoid potential deadlocks.
-// This is especially important when multiple libraries might be locking the
-// same resources or when complex locking hierarchies exist.
+// When an external mutex is provided, this library will use a no-op mutex
+// internally to prevent deadlocks when GetNewID is called within a context
+// that has already acquired the same mutex. This assumes that external
+// synchronization is being handled by the caller.
 //
 // Parameters:
 //   - handlerUserSessionNumber: Optional userSessionNumber implementation (required for WebAssembly)
@@ -119,6 +121,16 @@ type Config struct {
 //	// Server-side usage with existing mutex to avoid deadlocks:
 //	var mu sync.Mutex
 //	idHandler, err := unixid.NewUnixID(&mu)
+//
+//	// With external mutex, when calling within a locked context:
+//	var mu sync.Mutex
+//	idHandler, err := unixid.NewUnixID(&mu)
+//
+//	mu.Lock()
+//	defer mu.Unlock()
+//	// This won't deadlock because NewUnixID uses a no-op mutex internally
+//	// when an external mutex is provided
+//	id := idHandler.GetNewID()
 func NewUnixID(handlerUserSessionNumber ...any) (*UnixID, error) {
 	// The actual implementation is in the build-specific files
 	// This function declaration allows for a unified API

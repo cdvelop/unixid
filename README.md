@@ -102,7 +102,7 @@ func main() {
 	
 	// Pass the shared mutex to UnixID
 	idHandler, err := unixid.NewUnixID(&mu)
-	if err != nil {
+	if (err != nil) {
 		panic(err)
 	}
 	
@@ -113,6 +113,34 @@ func main() {
 	// preventing deadlocks when they need to lock resources
 }
 ```
+
+### Deadlock Prevention with External Mutex
+
+When an external mutex is provided to `NewUnixID()`, the library automatically detects this and changes its behavior:
+
+1. Instead of using the provided mutex internally, it switches to a no-op mutex that doesn't perform any actual locking.
+2. This allows `GetNewID()` to be safely called from within a context that has already acquired the same mutex.
+
+Example of using `GetNewID()` inside a locked context:
+
+```go
+var mu sync.Mutex
+idHandler, err := unixid.NewUnixID(&mu)
+if err != nil {
+    panic(err)
+}
+
+// Later in your code...
+mu.Lock()
+defer mu.Unlock()
+
+// This won't deadlock because internally the library uses a no-op mutex
+// when an external mutex is provided
+id := idHandler.GetNewID()
+// Do something with id...
+```
+
+This behavior assumes that external synchronization is being properly handled by the caller, eliminating the risk of deadlocks when the same mutex is used in nested contexts.
 
 ## API Reference
 

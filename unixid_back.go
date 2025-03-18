@@ -15,8 +15,9 @@ type timeServer struct{}
 // createUnixID implements the NewUnixID function for non-WebAssembly environments (server).
 // It configures a UnixID for server use with a mutex for synchronization.
 // In server environments, no user session handler is needed.
-// If a sync.Mutex is provided as a parameter, that mutex will be used instead of creating a new one,
-// which avoids potential deadlocks when integrating with other libraries using sync.
+// If a sync.Mutex is provided as a parameter, the function will assume that external
+// synchronization is being handled by the caller. In this case, a defaultNoOpMutex
+// will be used internally to prevent potential deadlocks.
 func createUnixID(params ...any) (*UnixID, error) {
 	t := &timeServer{}
 
@@ -27,21 +28,27 @@ func createUnixID(params ...any) (*UnixID, error) {
 		syncMutex:   &sync.Mutex{}, // Default mutex
 	}
 
+	externalMutexProvided := false
+
 	// Look for a mutex in the provided parameters
 	for _, param := range params {
 		switch mutex := param.(type) {
 		case *sync.Mutex:
-			// Use the provided mutex instead of the default
-			c.syncMutex = mutex
+			// If external mutex is provided, use a no-op mutex internally
+			// to prevent deadlocks when GetNewID is called inside another lock
+			externalMutexProvided = true
 		case sync.Mutex:
-			// If a mutex is passed by value, convert it to a pointer
-			// This is a copy of the original mutex, but it's better than nothing
-			ptrMutex := &mutex
-			c.syncMutex = ptrMutex
+			// If a mutex is passed by value, we also consider that an external mutex was provided
+			externalMutexProvided = true
 		case userSessionNumber:
 			// If a user session handler is provided, use it
 			c.Session = mutex
 		}
+	}
+
+	// If an external mutex was provided, use a no-op mutex to avoid deadlocks
+	if externalMutexProvided {
+		c.syncMutex = &defaultNoOpMutex{}
 	}
 
 	return configCheck(c)
