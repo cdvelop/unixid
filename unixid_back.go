@@ -12,17 +12,36 @@ import (
 // timeServer implements time functions for server-side environments
 type timeServer struct{}
 
-// createUnixID implementa la función NewUnixID para entornos no-WebAssembly (servidor).
-// Configura un UnixID para su uso en el servidor con un mutex para sincronización.
-// En entornos de servidor, no se requiere ningún manejador de sesión de usuario.
-func createUnixID(none ...any) (*UnixID, error) {
+// createUnixID implements the NewUnixID function for non-WebAssembly environments (server).
+// It configures a UnixID for server use with a mutex for synchronization.
+// In server environments, no user session handler is needed.
+// If a sync.Mutex is provided as a parameter, that mutex will be used instead of creating a new one,
+// which avoids potential deadlocks when integrating with other libraries using sync.
+func createUnixID(params ...any) (*UnixID, error) {
 	t := &timeServer{}
 
 	c := &Config{
-		Session:     &defaultEmptySession{}, // Usamos la implementación por defecto que no hace nada
+		Session:     &defaultEmptySession{}, // Use the default implementation that does nothing
 		timeNano:    t,
 		timeSeconds: t,
-		syncMutex:   &sync.Mutex{},
+		syncMutex:   &sync.Mutex{}, // Default mutex
+	}
+
+	// Look for a mutex in the provided parameters
+	for _, param := range params {
+		switch mutex := param.(type) {
+		case *sync.Mutex:
+			// Use the provided mutex instead of the default
+			c.syncMutex = mutex
+		case sync.Mutex:
+			// If a mutex is passed by value, convert it to a pointer
+			// This is a copy of the original mutex, but it's better than nothing
+			ptrMutex := &mutex
+			c.syncMutex = ptrMutex
+		case userSessionNumber:
+			// If a user session handler is provided, use it
+			c.Session = mutex
+		}
 	}
 
 	return configCheck(c)

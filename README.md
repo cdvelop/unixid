@@ -80,6 +80,40 @@ The generated IDs follow this format:
 - Server-side: `[unix_timestamp_in_nanoseconds]` (e.g., `1624397134562544800`)
 - Client-side: `[unix_timestamp_in_nanoseconds].[user_session_number]` (e.g., `1624397134562544800.42`)
 
+## Thread Safety & Avoiding Deadlocks
+
+The library handles concurrent ID generation safely through mutex locking in server-side environments.
+
+**IMPORTANT**: When integrating this library with other libraries that also use `sync.Mutex`, infinite deadlocks can occur. To avoid this issue, you can pass an existing mutex when initializing UnixID:
+
+```go
+package main
+
+import (
+	"fmt"
+	"sync"
+	"github.com/cdvelop/unixid"
+	"github.com/someother/library"
+)
+
+func main() {
+	// Create a shared mutex
+	var mu sync.Mutex
+	
+	// Pass the shared mutex to UnixID
+	idHandler, err := unixid.NewUnixID(&mu)
+	if err != nil {
+		panic(err)
+	}
+	
+	// Pass the same mutex to other libraries if they support it
+	otherLib := library.New(&mu)
+	
+	// Now both libraries will use the same mutex,
+	// preventing deadlocks when they need to lock resources
+}
+```
+
 ## API Reference
 
 ### Core Functions
@@ -90,6 +124,7 @@ The generated IDs follow this format:
   - Uses build tags (`wasm` or `!wasm`) to determine the appropriate implementation
   - Thread-safe in server environments with mutex locking
   - No mutex in WebAssembly as JavaScript is single-threaded
+  - Can accept an existing `sync.Mutex` or `*sync.Mutex` to prevent deadlocks when integrating with other libraries
 
 - `GetNewID()`: Generates a new unique ID
   - Returns a string representation of the ID
@@ -164,10 +199,6 @@ UnixID automatically detects the compilation environment and configures itself a
 
 This automatic configuration allows you to use the same API in both environments while the library handles the implementation details internally.
 
-## Thread Safety
-
-The library handles concurrent ID generation safely through mutex locking in server-side environments.
-
 ## License
 
-See the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.

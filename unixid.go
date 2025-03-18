@@ -93,8 +93,14 @@ type Config struct {
 // - Creates IDs with format: "[timestamp]" (e.g., "1624397134562544800")
 // - Uses a sync.Mutex for thread safety
 //
+// IMPORTANT: When integrating with other libraries that also use sync.Mutex,
+// you can pass an existing mutex as a parameter to avoid potential deadlocks.
+// This is especially important when multiple libraries might be locking the
+// same resources or when complex locking hierarchies exist.
+//
 // Parameters:
 //   - handlerUserSessionNumber: Optional userSessionNumber implementation (required for WebAssembly)
+//   - sync.Mutex or *sync.Mutex: Optional mutex to use instead of creating a new one (server-side only)
 //
 // Returns:
 //   - A configured *UnixID instance
@@ -109,6 +115,10 @@ type Config struct {
 //	type sessionHandler struct{}
 //	func (sessionHandler) userSessionNumber() string { return "42" }
 //	idHandler, err := unixid.NewUnixID(&sessionHandler{})
+//
+//	// Server-side usage with existing mutex to avoid deadlocks:
+//	var mu sync.Mutex
+//	idHandler, err := unixid.NewUnixID(&mu)
 func NewUnixID(handlerUserSessionNumber ...any) (*UnixID, error) {
 	// The actual implementation is in the build-specific files
 	// This function declaration allows for a unified API
