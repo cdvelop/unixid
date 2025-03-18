@@ -30,11 +30,11 @@ func createUnixID(none ...any) (*UnixID, error) {
 // In server environments, this returns just the Unix nanosecond timestamp value.
 // The method is thread-safe and handles concurrent access through a mutex lock.
 // Returns a string representation of the unique ID.
-func (id *UnixID) GetNewID() (string, error) {
+func (id *UnixID) GetNewID() string {
 	id.syncMutex.Lock()
 	defer id.syncMutex.Unlock()
 
-	return id.unixIdNano(), nil
+	return id.unixIdNano()
 }
 
 // SetValue sets a unique ID value to a struct field using reflection.
@@ -44,7 +44,7 @@ func (id *UnixID) GetNewID() (string, error) {
 //   - valueOut: A pointer to a string that will store the generated ID
 //   - sizeOut: A byte slice that will track the size of the generated value
 //
-// Returns nil on success or an error if the operation fails.
+// Note: This function is deprecated. Use SetNewID instead.
 func (id *UnixID) SetValue(rv *reflect.Value, valueOut *string, sizeOut []byte) error {
 	id.syncMutex.Lock()
 	defer id.syncMutex.Unlock()

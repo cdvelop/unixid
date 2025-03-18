@@ -26,11 +26,7 @@ func Test_GetNewID(t *testing.T) {
 		go func() {
 			defer wg.Done()
 
-			id, err := uid.GetNewID()
-			if err != nil {
-				t.Log(err)
-				return
-			}
+			id := uid.GetNewID()
 
 			esperar.Lock()
 			if cantId, exist := idObtained[id]; exist {
@@ -54,14 +50,56 @@ func Test_GetNewID(t *testing.T) {
 }
 
 func BenchmarkGetNewID(b *testing.B) {
-
 	uid, _ := unixid.NewUnixID()
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-
-		// var buf = []
-		// buf.Grow(20)
 		uid.GetNewID()
 	}
+}
 
+// Prueba adicional para verificar que no haya duplicados al generar muchos IDs
+func TestNoDuplicateIDs(t *testing.T) {
+	uid, err := unixid.NewUnixID()
+	if err != nil {
+		t.Fatal(err)
+		return
+	}
+
+	// Generar una cantidad moderada de IDs y verificar que no haya duplicados
+	numIDs := 1000
+	ids := make(map[string]bool)
+
+	for i := 0; i < numIDs; i++ {
+		id := uid.GetNewID()
+		if _, exists := ids[id]; exists {
+			t.Fatalf("ID duplicado encontrado: %s", id)
+		}
+		ids[id] = true
+	}
+}
+
+// Prueba para verificar que se generen IDs secuenciales cuando hay colisiones de timestamp
+func TestSequentialIDs(t *testing.T) {
+	uid, err := unixid.NewUnixID()
+	if err != nil {
+		t.Fatal(err)
+		return
+	}
+
+	// Generar varios IDs rápidamente, algunos tendrán el mismo timestamp base
+	// pero deberían tener números secuenciales añadidos
+	ids := make([]string, 10)
+	for i := 0; i < 10; i++ {
+		ids[i] = uid.GetNewID()
+	}
+
+	// Verificar que tengamos al menos algunos IDs diferentes
+	uniqueIDs := make(map[string]bool)
+	for _, id := range ids {
+		uniqueIDs[id] = true
+	}
+
+	if len(uniqueIDs) < len(ids) {
+		t.Fatalf("Se esperaban %d IDs únicos, pero se obtuvieron %d", len(ids), len(uniqueIDs))
+	}
 }

@@ -48,7 +48,7 @@ type UnixID struct {
 // Config holds the configuration and dependencies for a UnixID instance
 type Config struct {
 	// Session provides user session numbers in WebAssembly environments
-	Session UserSessionNumber // e.g., UserSessionNumber() string = "1","4","4000" etc.
+	Session userSessionNumber // e.g., userSessionNumber() string = "1","4","4000" etc.
 
 	// timeNano provides Unix timestamps at nanosecond precision
 	timeNano unixTimeNano // e.g., time.Now().UnixNano()
@@ -63,7 +63,7 @@ type Config struct {
 // NewUnixID creates a new UnixID handler with appropriate configuration based on the runtime environment.
 //
 // For WebAssembly environments (client-side):
-// - Requires a UserSessionNumber handler to be passed as a parameter
+// - Requires a userSessionNumber handler to be passed as a parameter
 // - Creates IDs with format: "[timestamp].[user_number]" (e.g., "1624397134562544800.42")
 // - No mutex is used as JavaScript is single-threaded
 //
@@ -73,7 +73,7 @@ type Config struct {
 // - Uses a sync.Mutex for thread safety
 //
 // Parameters:
-//   - handlerUserSessionNumber: Optional UserSessionNumber implementation (required for WebAssembly)
+//   - handlerUserSessionNumber: Optional userSessionNumber implementation (required for WebAssembly)
 //
 // Returns:
 //   - A configured *UnixID instance
@@ -86,7 +86,7 @@ type Config struct {
 //
 //	// WebAssembly usage:
 //	type sessionHandler struct{}
-//	func (sessionHandler) UserSessionNumber() (string, error) { return "42", nil }
+//	func (sessionHandler) userSessionNumber() string { return "42" }
 //	idHandler, err := unixid.NewUnixID(&sessionHandler{})
 func NewUnixID(handlerUserSessionNumber ...any) (*UnixID, error) {
 	// The actual implementation is in the build-specific files
@@ -97,7 +97,6 @@ func NewUnixID(handlerUserSessionNumber ...any) (*UnixID, error) {
 }
 
 func configCheck(c *Config) (*UnixID, error) {
-
 	if c == nil {
 		return nil, errConf
 	}
@@ -110,6 +109,14 @@ func configCheck(c *Config) (*UnixID, error) {
 		return nil, errSecond
 	}
 
+	// Para entornos WebAssembly, verificamos si se requiere un Session
+	if c.Session != nil {
+		userNum := c.Session.userSessionNumber()
+		if userNum == "" {
+			return nil, erNumSes
+		}
+	}
+
 	return &UnixID{
 		userNum:           "",
 		lastUnixNano:      0,
@@ -119,16 +126,82 @@ func configCheck(c *Config) (*UnixID, error) {
 	}, nil
 }
 
-// UserSessionNumber is an interface to obtain the current user's session number
+// userSessionNumber is an interface to obtain the current user's session number
 // This is primarily used in WebAssembly environments to uniquely identify client sessions
-type UserSessionNumber interface {
-	// UserSessionNumber returns a unique identifier for the current user session
+type userSessionNumber interface {
+	// userSessionNumber returns a unique identifier for the current user session
 	// e.g., "1" or "2" or "34" or "400" etc.
-	UserSessionNumber() (number string, err error)
+	userSessionNumber() string
+}
+
+// SetNewID sets a new unique ID value to various types of targets.
+// It generates a new unique ID based on Unix nanosecond timestamp and assigns it to the provided target.
+// This function can work with multiple target types including reflect.Value, string pointers, and byte slices.
+//
+// In WebAssembly environments, IDs include a user session number as a suffix (e.g., "1624397134562544800.42").
+// In server environments, IDs are just the timestamp (e.g., "1624397134562544800").
+//
+// Parameters:
+//   - target: The target to receive the new ID. Can be:
+//   - *reflect.Value: For setting struct field values via reflection
+//   - *string: For setting a string variable directly
+//   - []byte: For appending the ID to a byte slice
+//
+// This function is thread-safe in server-side environments.
+//
+// Examples:
+//
+//	// Setting a struct field using reflection
+//	rv := reflect.ValueOf(&myStruct).Elem().FieldByName("ID")
+//	idHandler.SetNewID(&rv)
+//
+//	// Setting a string variable
+//	var id string
+//	idHandler.SetNewID(&id)
+//
+//	// Appending to a byte slice
+//	buf := make([]byte, 0, 64)
+//	idHandler.SetNewID(buf)
+func (id *UnixID) SetNewID(target any) {
+	// Apply locking if mutex is available (server-side environments)
+	if id.syncMutex != nil {
+		id.syncMutex.Lock()
+		defer id.syncMutex.Unlock()
+	}
+
+	// Generate a new ID
+	newID := id.unixIdNano()
+
+	// In WebAssembly environments, append the user session number
+	if id.Session != nil {
+		// Get or update the user number
+		if id.userNum == "" {
+			id.userNum = id.Session.userSessionNumber()
+		}
+
+		// Only append if we have a valid user number
+		if id.userNum != "" {
+			newID += "."
+			newID += id.userNum
+		}
+	}
+
+	// Set the ID to the appropriate target type
+	switch t := target.(type) {
+	case *reflect.Value:
+		// For struct fields via reflection
+		t.SetString(newID)
+	case *string:
+		// For string variables
+		*t = newID
+	case []byte:
+		// For byte slices, we append the ID
+		// The caller is responsible for ensuring the slice has sufficient capacity
+		_ = append(t, []byte(newID)...)
+	}
 }
 
 func (id *UnixID) setValue(rv *reflect.Value, valueOut *string, sizeOut []byte) error {
-
 	*valueOut = id.unixIdNano()
 
 	size := uint8(len(*valueOut))
@@ -139,11 +212,9 @@ func (id *UnixID) setValue(rv *reflect.Value, valueOut *string, sizeOut []byte) 
 	rv.SetString(*valueOut)
 
 	return nil
-
 }
 
 func (id *UnixID) unixIdNano() string {
-
 	currentUnixNano := id.timeNano.UnixNano()
 
 	if currentUnixNano == id.lastUnixNano {
@@ -158,11 +229,10 @@ func (id *UnixID) unixIdNano() string {
 	currentUnixNano += id.correlativeNumber
 
 	return strconv.FormatInt(currentUnixNano, 10)
-
 }
 
 func (id *UnixID) unixIdNanoLAB() string {
-
+	// ...existing code...
 	currentUnixNano := id.timeNano.UnixNano()
 
 	if currentUnixNano == id.lastUnixNano {
@@ -189,21 +259,3 @@ func (id *UnixID) unixIdNanoLAB() string {
 	return *(*string)(unsafe.Pointer(&id.buf))
 	// return unsafe.String(unsafe.SliceData(id.buf), len(id.buf))
 }
-
-// v := int64(42)
-// b := unsafe.Slice((*byte)(unsafe.Pointer(&v)), unsafe.Sizeof(v))
-// fmt.Println(b, "id:", string(b))
-
-// b := *(*[]byte)(unsafe.Pointer(&v)) // Cast directly to a []byte pointer
-// fmt.Println(b, "id:", string(b))    // Output: [42 0 0 0 0 0 0 0] id: *
-
-// buf := unsafe.Slice((*byte)(unsafe.Pointer(&currentUnixNano)), unsafe.Sizeof(currentUnixNano))
-
-// fmt.Println("id:", string(buf))
-
-// return unsafe.String(unsafe.SliceData(buf), len(buf))
-// t := time.Now().UTC().UnixNano()
-//     b := unsafe.Slice((*byte)(unsafe.Pointer(&t)), unsafe.Sizeof(t))
-//     fmt.Println(b)
-
-// https://stackoverflow.com/questions/76431857/what-is-the-fastest-way-to-convert-int64-to-byte-array

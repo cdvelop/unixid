@@ -10,7 +10,7 @@ import (
 
 // createUnixID implementa la función NewUnixID para entornos WebAssembly.
 // Recibe un manejador de sesión de usuario opcional y configura un UnixID para su uso en el cliente.
-// En entornos WebAssembly, se requiere un manejador UserSessionNumber para generar IDs únicos entre sesiones.
+// En entornos WebAssembly, se requiere un manejador userSessionNumber para generar IDs únicos entre sesiones.
 func createUnixID(handlerUserSessionNumber ...any) (*UnixID, error) {
 	t := timeCLient{}
 
@@ -22,7 +22,7 @@ func createUnixID(handlerUserSessionNumber ...any) (*UnixID, error) {
 	}
 
 	for _, u := range handlerUserSessionNumber {
-		if usNumber, ok := u.(UserSessionNumber); ok {
+		if usNumber, ok := u.(userSessionNumber); ok {
 			c.Session = usNumber
 		}
 	}
@@ -38,19 +38,22 @@ func createUnixID(handlerUserSessionNumber ...any) (*UnixID, error) {
 // In client-side WebAssembly environments, this appends a user session number
 // to the timestamp, separated by a dot (e.g., "1624397134562544800.42").
 // This helps ensure that IDs are unique even across different client sessions.
-// Returns a string representation of the unique ID or an error if the user session number can't be obtained.
-func (id *UnixID) GetNewID() (string, error) {
-
+// Returns a string representation of the unique ID.
+func (id *UnixID) GetNewID() string {
 	outID := id.unixIdNano()
 
-	if err := id.setUserNumber(); err != nil {
-		return "", err
+	// Obtenemos o actualizamos el número de usuario si es necesario
+	if id.userNum == "" {
+		id.userNum = id.Session.userSessionNumber()
 	}
 
-	outID += "."
-	outID += id.userNum
+	// Solo añadimos el número de sesión si es válido
+	if id.userNum != "" {
+		outID += "."
+		outID += id.userNum
+	}
 
-	return outID, nil
+	return outID
 }
 
 // SetValue sets a unique ID value to a struct field using reflection.
@@ -60,13 +63,12 @@ func (id *UnixID) GetNewID() (string, error) {
 //   - valueOut: A pointer to a string that will store the generated ID
 //   - sizeOut: A byte slice that will track the size of the generated value
 //
-// Returns nil on success or an error if the operation fails.
+// Note: This function is deprecated. Use SetNewID instead.
 func (id *UnixID) SetValue(rv *reflect.Value, valueOut *string, sizeOut []byte) error {
-
 	*valueOut = id.unixIdNano()
 
-	if err := id.setUserNumber(); err != nil {
-		return err
+	if id.userNum == "" {
+		id.userNum = id.Session.userSessionNumber()
 	}
 
 	*valueOut += "."
@@ -82,25 +84,7 @@ func (id *UnixID) SetValue(rv *reflect.Value, valueOut *string, sizeOut []byte) 
 	return nil
 }
 
-// setUserNumber obtains and caches the user session number.
-// If the user number hasn't been set yet, it calls the UserSessionNumber method
-// provided in the Config to obtain it.
-// Returns an error if the user session number can't be obtained.
-func (id *UnixID) setUserNumber() (err error) {
-
-	if id.userNum == "" {
-		id.userNum, err = id.Session.UserSessionNumber()
-		if err != nil {
-			return
-		}
-
-		if id.userNum == "" {
-			err = erNumSes
-		}
-	}
-
-	return
-}
+// setUserNumber function is removed as it's no longer needed
 
 type timeCLient struct{}
 

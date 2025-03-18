@@ -12,6 +12,7 @@ UnixID provides functionality for generating and managing unique identifiers wit
 - Support for both server-side and client-side (WebAssembly) environments
 - Date conversion utilities for timestamp-to-date formatting
 - Smart environment detection for automatic configuration
+- Versatile ID assignment for strings, struct fields and byte slices
 
 ## Installation
 
@@ -39,10 +40,7 @@ func main() {
 	}
 
 	// Generate a new unique ID
-	id, err := idHandler.GetNewID()
-	if err != nil {
-		panic(err)
-	}
+	id := idHandler.GetNewID()
 
 	fmt.Printf("Generated ID: %s\n", id)
 	// Output: Generated ID: 1624397134562544800
@@ -55,13 +53,6 @@ func main() {
 
 	fmt.Printf("ID timestamp represents: %s\n", dateStr)
 	// Output: ID timestamp represents: 2021-06-23 15:38:54
-
-
-   // convert unix seconds to time
-   timeStr := unixid.UnixSecondsToTime(1624397134)
-   fmt.Printf("Unix seconds to time: %s\n", timeStr)
-   // Output: Unix seconds to time: 15:38:54
-
 }
 ```
 
@@ -73,9 +64,9 @@ For WebAssembly environments, you need to provide a session number handler:
 // Example session handler implementation
 type sessionHandler struct{}
 
-func (sessionHandler) UserSessionNumber() (number string, err error) {
+func (sessionHandler) userSessionNumber() string {
 	// In a real application, this would return the user's session number
-	return "42", nil
+	return "42"
 }
 
 // Create a new UnixID handler with session handler
@@ -95,7 +86,7 @@ The generated IDs follow this format:
 
 - `NewUnixID(...)`: Creates a new UnixID handler for ID generation with automatic environment detection
   - In server environments, no parameters are required
-  - In WebAssembly environments, requires a UserSessionNumber implementation
+  - In WebAssembly environments, requires a userSessionNumber implementation
   - Uses build tags (`wasm` or `!wasm`) to determine the appropriate implementation
   - Thread-safe in server environments with mutex locking
   - No mutex in WebAssembly as JavaScript is single-threaded
@@ -103,6 +94,26 @@ The generated IDs follow this format:
 - `GetNewID()`: Generates a new unique ID
   - Returns a string representation of the ID
   - In WebAssembly builds, appends a user session number to the timestamp
+
+- `SetNewID(target any)`: Sets a new unique ID to various target types
+  - Accepts pointers to string, reflect.Value, or byte slices
+  - Thread-safe in server environments
+  - Example usages:
+    ```go
+    // Set ID to a string variable
+    var id string
+    idHandler.SetNewID(&id)
+
+    // Set ID to a struct field
+    type User struct { ID string }
+    user := User{}
+    rv := reflect.ValueOf(&user).Elem().FieldByName("ID")
+    idHandler.SetNewID(&rv)
+    
+    // Append ID to a byte slice
+    buf := make([]byte, 0, 64)
+    idHandler.SetNewID(buf)
+    ```
 
 - `UnixNanoToStringDate(unixNanoStr)`: Converts a Unix nanosecond timestamp ID to a human-readable date
 
