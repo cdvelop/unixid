@@ -9,6 +9,9 @@ import (
 	"time"
 )
 
+// timeServer implements time functions for server-side environments
+type timeServer struct{}
+
 // createUnixID implementa la función NewUnixID para entornos no-WebAssembly (servidor).
 // Configura un UnixID para su uso en el servidor con un mutex para sincronización.
 // En entornos de servidor, no se requiere ningún manejador de sesión de usuario.
@@ -16,7 +19,7 @@ func createUnixID(none ...any) (*UnixID, error) {
 	t := &timeServer{}
 
 	c := &Config{
-		Session:     nil,
+		Session:     &defaultEmptySession{}, // Usamos la implementación por defecto que no hace nada
 		timeNano:    t,
 		timeSeconds: t,
 		syncMutex:   &sync.Mutex{},
@@ -24,20 +27,6 @@ func createUnixID(none ...any) (*UnixID, error) {
 
 	return configCheck(c)
 }
-
-// GetNewID generates a new unique ID based on Unix nanosecond timestamp.
-// In server environments, this returns just the Unix nanosecond timestamp value.
-// The method is thread-safe and handles concurrent access through a mutex lock.
-// Returns a string representation of the unique ID.
-func (id *UnixID) GetNewID() string {
-	id.syncMutex.Lock()
-	defer id.syncMutex.Unlock()
-
-	return id.unixIdNano()
-}
-
-// timeServer implements time functions for server-side environments
-type timeServer struct{}
 
 // UnixNano returns the current Unix time in nanoseconds
 func (timeServer) UnixNano() int64 {

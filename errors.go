@@ -2,12 +2,12 @@ package unixid
 
 import "errors"
 
-const erConfHead = "in unixid you must supply a valid handler for "
-
+// Error definitions
 var (
-	errConf   = errors.New("configuration (&Config = nil)")
-	errNano   = errors.New(erConfHead + "time, which returns the UnixNano() int64 method")
-	errSecond = errors.New(erConfHead + "time, which returns the UnixSecondsToDate(time_seconds int64) (date string) method")
-	erSes     = errors.New(erConfHead + "e.g.: userSessionNumber() string")
-	erNumSes  = errors.New(erConfHead + "user number must not be empty")
+	errConf   = errors.New("configuration options required")
+	errNano   = errors.New("timeNano function required")
+	errSecond = errors.New("timeSeconds function required")
+	erNumSes  = errors.New("session number required (empty number detected)")
+	erSes     = errors.New("session handler required")
+	errMutex  = errors.New("sync mutex required")
 )

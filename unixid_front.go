@@ -7,57 +7,31 @@ import (
 	"syscall/js"
 )
 
+type timeCLient struct{}
+
 // createUnixID implementa la función NewUnixID para entornos WebAssembly.
 // Recibe un manejador de sesión de usuario opcional y configura un UnixID para su uso en el cliente.
 // En entornos WebAssembly, se requiere un manejador userSessionNumber para generar IDs únicos entre sesiones.
 func createUnixID(handlerUserSessionNumber ...any) (*UnixID, error) {
 	t := timeCLient{}
 
+	// Crear la configuración con valores por defecto
 	c := &Config{
-		Session:     nil,
+		Session:     &defaultEmptySession{}, // Valor por defecto
 		timeNano:    t,
 		timeSeconds: t,
-		syncMutex:   nil,
+		syncMutex:   &defaultNoOpMutex{}, // Mutex que no hace nada para entornos WASM
 	}
 
+	// Reemplazar el manejador de sesión si se proporciona uno
 	for _, u := range handlerUserSessionNumber {
 		if usNumber, ok := u.(userSessionNumber); ok {
 			c.Session = usNumber
 		}
 	}
 
-	if c.Session == nil {
-		return nil, erSes
-	}
-
 	return configCheck(c)
 }
-
-// GetNewID generates a new unique ID based on Unix nanosecond timestamp.
-// In client-side WebAssembly environments, this appends a user session number
-// to the timestamp, separated by a dot (e.g., "1624397134562544800.42").
-// This helps ensure that IDs are unique even across different client sessions.
-// Returns a string representation of the unique ID.
-func (id *UnixID) GetNewID() string {
-	outID := id.unixIdNano()
-
-	// Obtenemos o actualizamos el número de usuario si es necesario
-	if id.userNum == "" {
-		id.userNum = id.Session.userSessionNumber()
-	}
-
-	// Solo añadimos el número de sesión si es válido
-	if id.userNum != "" {
-		outID += "."
-		outID += id.userNum
-	}
-
-	return outID
-}
-
-// setUserNumber function is removed as it's no longer needed
-
-type timeCLient struct{}
 
 // UnixNano retrieves the current Unix timestamp in nanoseconds.
 // It creates a new JavaScript Date object, gets the timestamp in milliseconds,

@@ -1,9 +1,7 @@
 package unixid
 
 import (
-	"reflect"
 	"strconv"
-	"unsafe"
 )
 
 const prefixNameID = "id_"
@@ -25,6 +23,29 @@ type lockHandler interface {
 	Lock()
 	Unlock()
 }
+
+// userSessionNumber is an interface to obtain the current user's session number
+// This is primarily used in WebAssembly environments to uniquely identify client sessions
+type userSessionNumber interface {
+	// userSessionNumber returns a unique identifier for the current user session
+	// e.g., "1" or "2" or "34" or "400" etc.
+	userSessionNumber() string
+}
+
+// defaultEmptySession provides a default implementation of userSessionNumber that returns an empty string
+// This is used in non-WebAssembly environments where session numbers are not needed
+type defaultEmptySession struct{}
+
+func (defaultEmptySession) userSessionNumber() string {
+	return ""
+}
+
+// defaultNoOpMutex provides a mutex implementation that doesn't perform any locking
+// This is safe to use in WebAssembly environments which are single-threaded
+type defaultNoOpMutex struct{}
+
+func (defaultNoOpMutex) Lock()   {}
+func (defaultNoOpMutex) Unlock() {}
 
 // UnixID is the main struct for ID generation and handling
 // It contains all configuration and state needed for ID generation
@@ -109,12 +130,14 @@ func configCheck(c *Config) (*UnixID, error) {
 		return nil, errSecond
 	}
 
-	// Para entornos WebAssembly, verificamos si se requiere un Session
-	if c.Session != nil {
-		userNum := c.Session.userSessionNumber()
-		if userNum == "" {
-			return nil, erNumSes
-		}
+	// Aseguramos que Session no sea nil (debería estar configurado en createUnixID)
+	if c.Session == nil {
+		return nil, erSes
+	}
+
+	// Aseguramos que syncMutex no sea nil (debería estar configurado en createUnixID)
+	if c.syncMutex == nil {
+		return nil, errMutex
 	}
 
 	return &UnixID{
@@ -124,94 +147,6 @@ func configCheck(c *Config) (*UnixID, error) {
 		buf:               make([]byte, 0, sizeBuf),
 		Config:            c,
 	}, nil
-}
-
-// userSessionNumber is an interface to obtain the current user's session number
-// This is primarily used in WebAssembly environments to uniquely identify client sessions
-type userSessionNumber interface {
-	// userSessionNumber returns a unique identifier for the current user session
-	// e.g., "1" or "2" or "34" or "400" etc.
-	userSessionNumber() string
-}
-
-// SetNewID sets a new unique ID value to various types of targets.
-// It generates a new unique ID based on Unix nanosecond timestamp and assigns it to the provided target.
-// This function can work with multiple target types including reflect.Value, string pointers, and byte slices.
-//
-// In WebAssembly environments, IDs include a user session number as a suffix (e.g., "1624397134562544800.42").
-// In server environments, IDs are just the timestamp (e.g., "1624397134562544800").
-//
-// Parameters:
-//   - target: The target to receive the new ID. Can be:
-//   - *reflect.Value: For setting struct field values via reflection
-//   - *string: For setting a string variable directly
-//   - []byte: For appending the ID to a byte slice
-//
-// This function is thread-safe in server-side environments.
-//
-// Examples:
-//
-//	// Setting a struct field using reflection
-//	rv := reflect.ValueOf(&myStruct).Elem().FieldByName("ID")
-//	idHandler.SetNewID(&rv)
-//
-//	// Setting a string variable
-//	var id string
-//	idHandler.SetNewID(&id)
-//
-//	// Appending to a byte slice
-//	buf := make([]byte, 0, 64)
-//	idHandler.SetNewID(buf)
-func (id *UnixID) SetNewID(target any) {
-	// Apply locking if mutex is available (server-side environments)
-	if id.syncMutex != nil {
-		id.syncMutex.Lock()
-		defer id.syncMutex.Unlock()
-	}
-
-	// Generate a new ID
-	newID := id.unixIdNano()
-
-	// In WebAssembly environments, append the user session number
-	if id.Session != nil {
-		// Get or update the user number
-		if id.userNum == "" {
-			id.userNum = id.Session.userSessionNumber()
-		}
-
-		// Only append if we have a valid user number
-		if id.userNum != "" {
-			newID += "."
-			newID += id.userNum
-		}
-	}
-
-	// Set the ID to the appropriate target type
-	switch t := target.(type) {
-	case *reflect.Value:
-		// For struct fields via reflection
-		t.SetString(newID)
-	case *string:
-		// For string variables
-		*t = newID
-	case []byte:
-		// For byte slices, we append the ID
-		// The caller is responsible for ensuring the slice has sufficient capacity
-		_ = append(t, []byte(newID)...)
-	}
-}
-
-func (id *UnixID) setValue(rv *reflect.Value, valueOut *string, sizeOut []byte) error {
-	*valueOut = id.unixIdNano()
-
-	size := uint8(len(*valueOut))
-
-	sizeOut = append(sizeOut, size)
-
-	// agregamos el id al campo de la estructura origen
-	rv.SetString(*valueOut)
-
-	return nil
 }
 
 func (id *UnixID) unixIdNano() string {
@@ -231,31 +166,27 @@ func (id *UnixID) unixIdNano() string {
 	return strconv.FormatInt(currentUnixNano, 10)
 }
 
-func (id *UnixID) unixIdNanoLAB() string {
-	// ...existing code...
-	currentUnixNano := id.timeNano.UnixNano()
+// GetNewID generates a new unique ID based on Unix nanosecond timestamp.
+// In WebAssembly environments, this appends a user session number to the timestamp.
+// In server environments, this returns just the Unix nanosecond timestamp.
+// Returns a string representation of the unique ID.
+func (id *UnixID) GetNewID() string {
+	// Aplicamos un bloqueo para garantizar la seguridad del hilo
+	id.syncMutex.Lock()
+	defer id.syncMutex.Unlock()
 
-	if currentUnixNano == id.lastUnixNano {
-		//mientras sean iguales sumar numero correlativo
-		id.correlativeNumber++
-	} else {
-		id.correlativeNumber = 0
+	outID := id.unixIdNano()
+
+	// Obtenemos o actualizamos el número de usuario si es necesario
+	if id.userNum == "" {
+		id.userNum = id.Session.userSessionNumber()
 	}
-	// actualizo la variable unix nano
-	id.lastUnixNano = currentUnixNano
 
-	currentUnixNano += id.correlativeNumber
+	// Solo añadimos el número de sesión si es válido
+	if id.userNum != "" {
+		outID += "."
+		outID += id.userNum
+	}
 
-	id.buf = id.buf[:0]
-
-	// fmt.Println("size buffer:", sizeBuf)
-
-	id.buf = strconv.AppendInt(id.buf, currentUnixNano, 10)
-	// id.buf = strconv.AppendUint(id.buf, currentUnixNano, 10)
-
-	// fmt.Println("tmpBuf:", id.buf, "size id buffer:", len(id.buf))
-
-	// return string(id.buf)
-	return *(*string)(unsafe.Pointer(&id.buf))
-	// return unsafe.String(unsafe.SliceData(id.buf), len(id.buf))
+	return outID
 }
