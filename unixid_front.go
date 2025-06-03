@@ -5,6 +5,8 @@ package unixid
 
 import (
 	"syscall/js"
+
+	"github.com/cdvelop/tinystring"
 )
 
 type timeCLient struct{}
@@ -76,6 +78,7 @@ func (timeCLient) UnixNano() int64 {
 //	ts := int64(1609459200) // January 1, 2021 00:00:00 UTC
 //	formattedDate := UnixSecondsToDate(ts)
 //	fmt.Println(formattedDate) // Output: "2021-01-01 00:00:00"
+
 func (timeCLient) UnixSecondsToDate(unixSeconds int64) (date string) {
 	// Crea una instancia de Date de JavaScript a partir de los segundos de Unix
 	jsDate := js.Global().Get("Date").New(float64(unixSeconds) * 1000)
@@ -87,7 +90,53 @@ func (timeCLient) UnixSecondsToDate(unixSeconds int64) (date string) {
 	date = dateJSValue.String()
 
 	// Formatea la cadena de fecha a "2006-01-02 15:04"
-	date = date[0:10] + " " + date[11:19]
+	date = date[0:10] + " " + date[11:16]
 
 	return
+}
+
+// UnixNanoToTime converts a Unix timestamp in nanoseconds to a formatted time string.
+// Format: "15:04:05" (hour:minute:second)
+// It accepts a parameter of type any and attempts to convert it to an int64 Unix timestamp in nanoseconds.
+// eg: 1624397134562544800 -> "15:32:14"
+// supported types: int64, int, float64, string
+func (u UnixID) UnixNanoToTime(input any) string {
+	var unixNano int64
+	switch v := input.(type) {
+	case int64:
+		unixNano = v
+	case int:
+		unixNano = int64(v)
+	case float64:
+		unixNano = int64(v)
+	case string:
+		// Parse string to int64
+		parsed := int64(0)
+		multiplier := int64(1)
+		for i := len(v) - 1; i >= 0; i-- {
+			if v[i] >= '0' && v[i] <= '9' {
+				parsed += int64(v[i]-'0') * multiplier
+				multiplier *= 10
+			} else {
+				return "" // Invalid character
+			}
+		}
+		unixNano = parsed
+	default:
+		return ""
+	}
+
+	// Convert nanoseconds to seconds
+	unixSeconds := unixNano / 1e9
+
+	// Use JavaScript Date to format time
+	jsDate := js.Global().Get("Date").New(unixSeconds * 1000) // JS Date expects milliseconds
+
+	// Get hours, minutes, seconds
+	hours := jsDate.Call("getHours").Int()
+	minutes := jsDate.Call("getMinutes").Int()
+	seconds := jsDate.Call("getSeconds").Int()
+
+	// Format as HH:MM:SS
+	return tinystring.Format("%02d:%02d:%02d", hours, minutes, seconds).String()
 }

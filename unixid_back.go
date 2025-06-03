@@ -69,30 +69,32 @@ func (timeServer) UnixSecondsToDate(unixSeconds int64) (date string) {
 	return t.Format("2006-01-02 15:04")
 }
 
-// UnixSecondsToTime converts a Unix timestamp in seconds to a formatted time string.
+// UnixNanoToTime converts a Unix timestamp in nanoseconds to a formatted time string.
 // Format: "15:04:05" (hour:minute:second)
-// It accepts a parameter of type any and attempts to convert it to an int64 Unix timestamp.
-// eg: 1624397134 -> "15:32:14"
+// It accepts a parameter of type any and attempts to convert it to an int64 Unix timestamp in nanoseconds.
+// eg: 1624397134562544800 -> "15:32:14"
 // supported types: int64, int, float64, string
-func (u UnixID) UnixSecondsToTime(input any) string {
-	var unixSeconds int64
+func (u UnixID) UnixNanoToTime(input any) string {
+	var unixNano int64
 	switch v := input.(type) {
 	case int64:
-		unixSeconds = v
+		unixNano = v
 	case int:
-		unixSeconds = int64(v)
+		unixNano = int64(v)
 	case float64:
-		unixSeconds = int64(v)
+		unixNano = int64(v)
 	case string:
 		parsed, err := strconv.ParseInt(v, 10, 64)
 		if err != nil {
 			return ""
 		}
-		unixSeconds = parsed
+		unixNano = parsed
 	default:
 		return ""
 	}
 
+	// Convert nanoseconds to seconds
+	unixSeconds := unixNano / 1e9
 	t := time.Unix(unixSeconds, 0)
 	return t.Format("15:04:05")
 }

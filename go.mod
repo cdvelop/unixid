@@ -1,3 +1,5 @@
 module github.com/cdvelop/unixid
 
-go 1.20
+go 1.22.0
+
+require github.com/cdvelop/tinystring v0.0.33

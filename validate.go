@@ -3,6 +3,8 @@ package unixid
 import (
 	"errors"
 	"strconv"
+
+	"github.com/cdvelop/tinystring"
 )
 
 // ValidateID validates and parses a Unix timestamp ID string.
@@ -41,6 +43,8 @@ func ValidateID(new_id_in string) (id int64, err error) {
 	id_out = new_id_in[:point_index]
 
 	// fmt.Println("ID SALIDA:", id_out)
+
+	tinystring.Convert(id_out).ToInt()
 
 	id, er := strconv.ParseInt(id_out, 10, 64)
 	if er != nil {
