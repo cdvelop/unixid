@@ -2,4 +2,4 @@ module github.com/cdvelop/unixid
 
 go 1.22.0
 
-require github.com/cdvelop/tinystring v0.0.42
+require github.com/cdvelop/tinystring v0.0.43
