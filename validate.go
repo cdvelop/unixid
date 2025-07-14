@@ -1,7 +1,7 @@
 package unixid
 
 import (
-	"github.com/cdvelop/tinystring"
+	. "github.com/cdvelop/tinystring"
 )
 
 // ValidateID validates and parses a Unix timestamp ID string.
@@ -21,14 +21,14 @@ import (
 func ValidateID(new_id_in string) (id int64, err error) {
 	var id_out string
 	// Mensajes usando el diccionario multilenguaje
-	msg_invalid := tinystring.Err(
-		tinystring.D.Invalid, tinystring.D.Character, tinystring.D.Not, tinystring.D.Supported,
-	)
-	msg_point := tinystring.Err(
-		tinystring.D.Invalid, tinystring.D.Format, tinystring.D.Found, tinystring.D.More, tinystring.D.Point,
-	)
+	msg_invalid := Err(D.Character, D.Invalid, D.Not, D.Supported)
 
 	if len(new_id_in) == 0 {
+		return 0, msg_invalid
+	}
+
+	// No debe comenzar ni terminar con punto
+	if new_id_in[0] == '.' || new_id_in[len(new_id_in)-1] == '.' {
 		return 0, msg_invalid
 	}
 
@@ -39,7 +39,7 @@ func ValidateID(new_id_in string) (id int64, err error) {
 			point_count++
 			point_index = i
 			if point_count > 1 {
-				return 0, msg_point
+				return 0, Err(D.Invalid, D.Format, D.Found, D.More, D.Point)
 			}
 		} else if char < '0' || char > '9' {
 			return 0, msg_invalid
@@ -48,7 +48,7 @@ func ValidateID(new_id_in string) (id int64, err error) {
 
 	id_out = new_id_in[:point_index]
 
-	id, er := tinystring.Convert(id_out).Int64()
+	id, er := Convert(id_out).Int64()
 	if er != nil {
 		return 0, msg_invalid
 	}
