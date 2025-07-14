@@ -1,10 +1,10 @@
 package unixid_test
 
 import (
-	"fmt"
 	"testing"
 	"time"
 
+	. "github.com/cdvelop/tinystring"
 	"github.com/cdvelop/unixid"
 )
 
@@ -22,7 +22,7 @@ func TestIdToDate(t *testing.T) {
 		inputData string
 		expected  string
 	}{
-		"id sin punto ok":             {fmt.Sprint(now_nano), now_expected},
+		"id sin punto ok":             {Fmt("%d", now_nano), now_expected},
 		"id 2022 ":                    {"1643317560659315800", "2022-01-27 18:06"},
 		"id 2023 ":                    {"1672949057314961800", "2023-01-05 17:04"},
 		"id 2022-01-27":               {"1643319071971938900", "2022-01-27 18:31"},
@@ -30,9 +30,9 @@ func TestIdToDate(t *testing.T) {
 		"id 2022-01-19":               {"1643318806368317300", "2022-01-27 18:26"},
 		"id 2022-01-19 con .":         {"1643318806368317300.5", "2022-01-27 18:26"},
 		"id 2023-03-30 con .":         {"1680184020131482400.0", "2023-03-30 10:47"},
-		"error id 2023-03-30 con E":   {"16801E4020131482400.0", "ValidateID id contiene caracteres no válidos"},
-		"error id 2023-03-30 con .. ": {"16801840201.31482400.0", "ValidateID id contiene más de un punto"},
-		"error sin data de entrada":   {"", "ValidateID id contiene caracteres no válidos"},
+		"error id 2023-03-30 con E":   {"16801E4020131482400.0", "invalid character not supported"},
+		"error id 2023-03-30 con .. ": {"16801840201.31482400.0", "invalid format found more point"},
+		"error sin data de entrada":   {"", "invalid character not supported"},
 	}
 
 	for prueba, data := range testData {
@@ -45,8 +45,7 @@ func TestIdToDate(t *testing.T) {
 			}
 
 			if resp != data.expected {
-				fmt.Println("ERROR prueba:", prueba)
-				t.Fatalf("- [%v] resultado:\n[%v]\n-expectativa:\n[%v]\n\n", data.inputData, resp, data.expected)
+				t.Fatalf("ERROR prueba:%v\n- [%v] resultado:\n[%v]\n-expectativa:\n[%v]\n\n", prueba, data.inputData, resp, data.expected)
 			}
 		})
 	}

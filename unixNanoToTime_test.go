@@ -1,10 +1,10 @@
 package unixid_test
 
 import (
-	"fmt"
 	"testing"
 	"time"
 
+	. "github.com/cdvelop/tinystring"
 	"github.com/cdvelop/unixid"
 )
 
@@ -28,7 +28,7 @@ func TestUnixNanoToTime(t *testing.T) {
 	}
 
 	// Test con string
-	result = uid.UnixNanoToTime(fmt.Sprintf("%d", nanoTimestamp))
+	result = uid.UnixNanoToTime(Fmt("%d", nanoTimestamp))
 	if result != expected {
 		t.Errorf("UnixNanoToTime(string) = %s; want %s", result, expected)
 	}
@@ -70,7 +70,7 @@ func TestUnixNanoToTimeWithDifferentTypes(t *testing.T) {
 		{"int64", nanoTimestamp},
 		{"int", int(nanoTimestamp)},
 		{"float64", float64(nanoTimestamp)},
-		{"string", fmt.Sprintf("%d", nanoTimestamp)},
+		{"string", Fmt("%d", nanoTimestamp)},
 	}
 
 	for _, tc := range testCases {

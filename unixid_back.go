@@ -4,9 +4,10 @@
 package unixid
 
 import (
-	"strconv"
 	"sync"
 	"time"
+
+	"github.com/cdvelop/tinystring"
 )
 
 // timeServer implements time functions for server-side environments
@@ -84,11 +85,11 @@ func (u UnixID) UnixNanoToTime(input any) string {
 	case float64:
 		unixNano = int64(v)
 	case string:
-		parsed, err := strconv.ParseInt(v, 10, 64)
+		val, err := tinystring.Convert(v).Int64()
 		if err != nil {
 			return ""
 		}
-		unixNano = parsed
+		unixNano = val
 	default:
 		return ""
 	}

@@ -1,7 +1,7 @@
 package unixid
 
 import (
-	"strconv"
+	. "github.com/cdvelop/tinystring"
 )
 
 const prefixNameID = "id_"
@@ -141,25 +141,25 @@ func NewUnixID(handlerUserSessionNumber ...any) (*UnixID, error) {
 
 func configCheck(c *Config) (*UnixID, error) {
 	if c == nil {
-		return nil, errConf
+		return nil, Err(D.Required, D.Configuration, D.Options)
 	}
 
 	if c.timeNano == nil {
-		return nil, errNano
+		return nil, Err(D.Required, D.Time, D.Nano)
 	}
 
 	if c.timeSeconds == nil {
-		return nil, errSecond
+		return nil, Err(D.Required, D.Time, D.Seconds)
 	}
 
 	// Aseguramos que Session no sea nil (debería estar configurado en createUnixID)
 	if c.Session == nil {
-		return nil, erSes
+		return nil, Err(D.Required, D.Session, D.Handler)
 	}
 
 	// Aseguramos que syncMutex no sea nil (debería estar configurado en createUnixID)
 	if c.syncMutex == nil {
-		return nil, errMutex
+		return nil, Err(D.Required, D.Sync, D.Mutex)
 	}
 
 	return &UnixID{
@@ -185,7 +185,7 @@ func (id *UnixID) unixIdNano() string {
 
 	currentUnixNano += id.correlativeNumber
 
-	return strconv.FormatInt(currentUnixNano, 10)
+	return Convert(currentUnixNano).String()
 }
 
 // GetNewID generates a new unique ID based on Unix nanosecond timestamp.

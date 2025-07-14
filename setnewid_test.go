@@ -2,9 +2,9 @@ package unixid_test
 
 import (
 	"reflect"
-	"strings"
 	"testing"
 
+	. "github.com/cdvelop/tinystring"
 	"github.com/cdvelop/unixid"
 )
 
@@ -37,7 +37,7 @@ func TestSetNewID(t *testing.T) {
 		}
 
 		// Validamos que tenga un formato correcto para servidor
-		if strings.Contains(id, ".") {
+		if Contains(id, ".") {
 			t.Fatalf("En entorno servidor, el ID no debe contener punto: %s", id)
 		}
 	})
@@ -55,7 +55,7 @@ func TestSetNewID(t *testing.T) {
 		}
 
 		// Validamos que tenga un formato correcto para servidor
-		if strings.Contains(testObj.ID, ".") {
+		if Contains(testObj.ID, ".") {
 			t.Fatalf("En entorno servidor, el ID no debe contener punto: %s", testObj.ID)
 		}
 	})

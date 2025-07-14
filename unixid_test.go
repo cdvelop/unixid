@@ -1,7 +1,6 @@
 package unixid_test
 
 import (
-	"fmt"
 	"sync"
 	"testing"
 	"time"
@@ -43,9 +42,7 @@ func Test_GetNewID(t *testing.T) {
 
 	// fmt.Printf("total id requeridos: %v ob: %v\n", idRequired, len(idObtained))
 	if idRequired != len(idObtained) {
-		fmt.Printf("%v", idObtained)
-		t.Fatal("se esperaban:", idRequired, " ids pero se obtuvieron:", len(idObtained))
-		t.Fail()
+		t.Fatalf("se esperaban: %d ids pero se obtuvieron: %d. Detalle: %v", idRequired, len(idObtained), idObtained)
 	}
 
 }

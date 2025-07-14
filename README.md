@@ -28,7 +28,6 @@ go get github.com/cdvelop/unixid
 package main
 
 import (
-	"fmt"
 	"github.com/cdvelop/unixid"
 )
 
@@ -51,7 +50,7 @@ func main() {
 		panic(err)
 	}
 
-	fmt.Printf("ID timestamp represents: %s\n", dateStr)
+	println("ID timestamp represents: ", dateStr)
 	// Output: ID timestamp represents: 2021-06-23 15:38:54
 }
 ```

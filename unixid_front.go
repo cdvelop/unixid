@@ -138,5 +138,5 @@ func (u UnixID) UnixNanoToTime(input any) string {
 	seconds := jsDate.Call("getSeconds").Int()
 
 	// Format as HH:MM:SS
-	return tinystring.Format("%02d:%02d:%02d", hours, minutes, seconds).String()
+	return tinystring.Fmt("%02d:%02d:%02d", hours, minutes, seconds)
 }

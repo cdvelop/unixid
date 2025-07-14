@@ -1,9 +1,6 @@
 package unixid
 
 import (
-	"errors"
-	"strconv"
-
 	"github.com/cdvelop/tinystring"
 )
 
@@ -23,8 +20,17 @@ import (
 //   - The timestamp portion (before the decimal point) must be a valid int64
 func ValidateID(new_id_in string) (id int64, err error) {
 	var id_out string
-	const e = "ValidateID "
-	const msg = "id contiene caracteres no válidos"
+	// Mensajes usando el diccionario multilenguaje
+	msg_invalid := tinystring.Err(
+		tinystring.D.Invalid, tinystring.D.Character, tinystring.D.Not, tinystring.D.Supported,
+	)
+	msg_point := tinystring.Err(
+		tinystring.D.Invalid, tinystring.D.Format, tinystring.D.Found, tinystring.D.More, tinystring.D.Point,
+	)
+
+	if len(new_id_in) == 0 {
+		return 0, msg_invalid
+	}
 
 	var point_count int
 	var point_index = len(new_id_in)
@@ -33,22 +39,18 @@ func ValidateID(new_id_in string) (id int64, err error) {
 			point_count++
 			point_index = i
 			if point_count > 1 {
-				return 0, errors.New(e + "id contiene más de un punto")
+				return 0, msg_point
 			}
 		} else if char < '0' || char > '9' {
-			return 0, errors.New(e + msg)
+			return 0, msg_invalid
 		}
 	}
 
 	id_out = new_id_in[:point_index]
 
-	// fmt.Println("ID SALIDA:", id_out)
-
-	
-
-	id, er := tinystring.Convert(id_out).
+	id, er := tinystring.Convert(id_out).Int64()
 	if er != nil {
-		return 0, errors.New(e + msg)
+		return 0, msg_invalid
 	}
 
 	return id, nil

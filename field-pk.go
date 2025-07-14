@@ -1,8 +1,6 @@
 package unixid
 
-import (
-	"strings"
-)
+import . "github.com/cdvelop/tinystring"
 
 // FieldType determines if a field is an ID field and/or a primary key field.
 // This function analyzes field names to identify ID fields and primary keys based on naming conventions.
@@ -22,8 +20,7 @@ import (
 //   - FieldType("user", "idaddress") returns (true, false)
 func (u *UnixID) FieldType(tableName, fieldName string) (ID, PK bool) {
 	if len(fieldName) >= 2 {
-
-		key_name := strings.ToLower(fieldName)
+		key_name := Convert(fieldName).Low().String()
 
 		if key_name[:2] != "id" {
 			return
@@ -37,18 +34,15 @@ func (u *UnixID) FieldType(tableName, fieldName string) (ID, PK bool) {
 		}
 
 		var key_without_id string
-		if strings.Contains(key_name, prefixNameID) {
-
-			key_without_id = strings.Replace(key_name, prefixNameID, "", 1) //remove _
+		if Contains(key_name, prefixNameID) {
+			key_without_id = Convert(key_name).Replace(prefixNameID, "").String() //remove _
 		} else {
-
 			key_without_id = key_name[2:] //remove id
 		}
 
 		if key_without_id == tableName {
 			PK = true
 		}
-
 	}
 	return
 }

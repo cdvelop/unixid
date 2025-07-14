@@ -1,6 +1,6 @@
 package unixid
 
-import "errors"
+import "github.com/cdvelop/tinystring"
 
 // UnixNanoToStringDate converts a Unix nanosecond timestamp ID to a human-readable date string.
 // This function accepts a string representation of a Unix nanosecond timestamp (with or without a user number suffix)
@@ -32,7 +32,7 @@ func (u *UnixID) UnixNanoToStringDate(unixNanoStr string) (string, error) {
 	unixSeconds := unixNano / 1e9
 
 	if u.timeSeconds == nil {
-		return "", errors.New("adaptador unixTimeSeconds nil")
+		return "", tinystring.Err("adaptador unixTimeSeconds nil")
 	}
 
 	return u.timeSeconds.UnixSecondsToDate(unixSeconds), nil
