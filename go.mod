@@ -1,7 +1,10 @@
 module github.com/cdvelop/unixid
 
-go 1.22.0
+go 1.24.4
 
-require github.com/cdvelop/tinystring v0.1.32
+require (
+	github.com/cdvelop/tinystring v0.1.32
+	github.com/cdvelop/tinytime v0.0.2
+)
 
 replace github.com/cdvelop/tinystring => ../tinystring

@@ -2,20 +2,11 @@ package unixid
 
 import (
 	. "github.com/cdvelop/tinystring"
+	"github.com/cdvelop/tinytime"
 )
 
 const prefixNameID = "id_"
 const sizeBuf = int32(19)
-
-// unixTimeNano represents a time provider that can return Unix time in nanoseconds
-type unixTimeNano interface {
-	UnixNano() int64
-}
-
-// unixTimeSeconds represents a time provider that can format Unix timestamps as human-readable dates
-type unixTimeSeconds interface {
-	UnixSecondsToDate(time_seconds int64) (date string)
-}
 
 // lockHandler represents a mutex-like locking mechanism for thread safety
 // Typically a sync.Mutex or similar implementation is used
@@ -71,11 +62,8 @@ type Config struct {
 	// Session provides user session numbers in WebAssembly environments
 	Session userSessionNumber // e.g., userSessionNumber() string = "1","4","4000" etc.
 
-	// timeNano provides Unix timestamps at nanosecond precision
-	timeNano unixTimeNano // e.g., time.Now().UnixNano()
-
-	// timeSeconds formats Unix timestamps as human-readable dates
-	timeSeconds unixTimeSeconds // e.g., converts 15454454677767 to "2006-01-02 15:04"
+	// TimeProvider provides time utilities including nanosecond timestamps and date formatting
+	TimeProvider tinytime.TimeProvider // Provides UnixNano(), UnixSecondsToDate(), and UnixNanoToTime()
 
 	// syncMutex provides thread safety for concurrent ID generation
 	syncMutex lockHandler // e.g., sync.Mutex{}
@@ -144,12 +132,8 @@ func configCheck(c *Config) (*UnixID, error) {
 		return nil, Err(D.Required, D.Configuration, D.Options)
 	}
 
-	if c.timeNano == nil {
-		return nil, Err(D.Required, D.Time, D.Nano)
-	}
-
-	if c.timeSeconds == nil {
-		return nil, Err(D.Required, D.Time, D.Seconds)
+	if c.TimeProvider == nil {
+		return nil, Err(D.Required, D.Time, D.Handler)
 	}
 
 	// Aseguramos que Session no sea nil (debería estar configurado en createUnixID)
@@ -172,7 +156,7 @@ func configCheck(c *Config) (*UnixID, error) {
 }
 
 func (id *UnixID) unixIdNano() string {
-	currentUnixNano := id.timeNano.UnixNano()
+	currentUnixNano := id.TimeProvider.UnixNano()
 
 	if currentUnixNano == id.lastUnixNano {
 		//mientras sean iguales sumar numero correlativo
@@ -211,4 +195,20 @@ func (id *UnixID) GetNewID() string {
 	}
 
 	return outID
+}
+
+// UnixNanoToTime converts a Unix timestamp in nanoseconds to a formatted time string.
+// Format: "15:04:05" (hour:minute:second)
+// It accepts a parameter of type any and attempts to convert it to an int64 Unix timestamp in nanoseconds.
+// eg: 1624397134562544800 -> "15:32:14"
+// supported types: int64, int, float64, string
+func (id *UnixID) UnixNanoToTime(input any) string {
+	return id.TimeProvider.UnixNanoToTime(input)
+}
+
+// UnixSecondsToDate converts Unix seconds to a formatted date string.
+// Format: "2006-01-02 15:04" (YYYY-MM-DD HH:MM)
+// eg: 1624397134 -> "2021-06-22 15:32"
+func (id *UnixID) UnixSecondsToDate(unixSeconds int64) string {
+	return id.TimeProvider.UnixSecondsToDate(unixSeconds)
 }
