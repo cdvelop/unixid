@@ -161,7 +161,7 @@ This behavior assumes that external synchronization is being properly handled by
   - In WebAssembly builds, appends a user session number to the timestamp
 
 - `SetNewID(target any)`: Sets a new unique ID to various target types
-  - Accepts pointers to string, reflect.Value, or byte slices
+  - Accepts pointers to string, tinyreflect.Value, or byte slices
   - Thread-safe in server environments
   - Example usages:
     ```go
@@ -172,12 +172,27 @@ This behavior assumes that external synchronization is being properly handled by
     // Set ID to a struct field
     type User struct { ID string }
     user := User{}
-    rv := reflect.ValueOf(&user).Elem().FieldByName("ID")
-    idHandler.SetNewID(&rv)
+    idHandler.SetNewID(&user.ID)
     
     // Append ID to a byte slice
     buf := make([]byte, 0, 64)
     idHandler.SetNewID(buf)
+
+	// Set ID to a tinyreflect.Value
+	v := tinyreflect.ValueOf(&user)
+	// The ValueOf(&data) returns a Ptr. We need to get the element it points to
+	// before we can access its fields. This is what Elem() does.
+	structVal, err := v.Elem()
+	if err != nil {
+		// Failed to get element from pointer value:...
+	}
+
+	IDField, err := structVal.Field(0)
+	if err != nil {
+		// Failed to get field 'ID':...
+	}
+	idHandler.SetNewID(&IDField)
+
     ```
 
 - `UnixNanoToStringDate(unixNanoStr)`: Converts a Unix nanosecond timestamp ID to a human-readable date
