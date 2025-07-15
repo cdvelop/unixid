@@ -1,6 +1,6 @@
 package unixid
 
-import "reflect"
+import "github.com/cdvelop/tinyreflect"
 
 // SetNewID sets a new unique ID value to various types of targets.
 // It generates a new unique ID based on Unix nanosecond timestamp and assigns it to the provided target.
@@ -20,7 +20,7 @@ import "reflect"
 // Examples:
 //
 //	// Setting a struct field using reflection
-//	rv := reflect.ValueOf(&myStruct).Elem().FieldByName("ID")
+//	rv := tinyreflect.ValueOf(&myStruct).Elem().FieldByName("ID")
 //	idHandler.SetNewID(&rv)
 //
 //	// Setting a string variable
@@ -36,7 +36,7 @@ func (id *UnixID) SetNewID(target any) {
 
 	// Set the ID to the appropriate target type
 	switch t := target.(type) {
-	case *reflect.Value:
+	case *tinyreflect.Value:
 		// For struct fields via reflection
 		t.SetString(newID)
 	case *string:
