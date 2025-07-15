@@ -1,9 +1,9 @@
 package unixid_test
 
 import (
-	"reflect"
 	"testing"
 
+	"github.com/cdvelop/tinyreflect"
 	. "github.com/cdvelop/tinystring"
 	"github.com/cdvelop/unixid"
 )
@@ -42,13 +42,21 @@ func TestSetNewID(t *testing.T) {
 		}
 	})
 
-	t.Run("SetNewID con reflect.Value", func(t *testing.T) {
+	t.Run("SetNewID con tinyreflect.Value", func(t *testing.T) {
 		// Creamos una estructura para prueba
 		testObj := TestStruct{}
 
-		// Obtenemos el campo ID usando reflection
-		rv := reflect.ValueOf(&testObj).Elem().FieldByName("ID")
-		uid.SetNewID(&rv)
+		// Obtenemos el campo ID usando tinyreflect
+		v := tinyreflect.ValueOf(&testObj)
+		elem, err := v.Elem()
+		if err != nil {
+			t.Fatalf("Elem() failed: %v", err)
+		}
+		field, err := elem.Field(0) // ID es el primer campo (índice 0)
+		if err != nil {
+			t.Fatalf("Field(0) failed: %v", err)
+		}
+		uid.SetNewID(field)
 
 		if testObj.ID == "" {
 			t.Fatal("El ID generado no puede estar vacío")
@@ -57,6 +65,37 @@ func TestSetNewID(t *testing.T) {
 		// Validamos que tenga un formato correcto para servidor
 		if Contains(testObj.ID, ".") {
 			t.Fatalf("En entorno servidor, el ID no debe contener punto: %s", testObj.ID)
+		}
+	})
+
+	t.Run("SetNewID con *tinyreflect.Value", func(t *testing.T) {
+		// Creamos una estructura para prueba
+		testObj := TestStruct{}
+
+		// Obtenemos el campo ID usando tinyreflect
+		v := tinyreflect.ValueOf(&testObj)
+		elem, err := v.Elem()
+		if err != nil {
+			t.Fatalf("Elem() failed: %v", err)
+		}
+		field, err := elem.Field(0) // ID es el primer campo (índice 0)
+		if err != nil {
+			t.Fatalf("Field(0) failed: %v", err)
+		}
+		uid.SetNewID(&field) // Pasamos un puntero a la Value
+
+		if testObj.ID == "" {
+			t.Fatal("El ID generado no puede estar vacío")
+		}
+	})
+
+	t.Run("SetNewID con tipo no soportado", func(t *testing.T) {
+		var unsupportedType int
+		// Esta llamada no debería causar pánico.
+		// La función simplemente no hará nada.
+		uid.SetNewID(unsupportedType)
+		if unsupportedType != 0 {
+			t.Error("SetNewID modificó un tipo no soportado")
 		}
 	})
 
