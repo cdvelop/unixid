@@ -5,5 +5,5 @@ go 1.24.4
 require (
 	github.com/cdvelop/tinyreflect v0.0.22
 	github.com/cdvelop/tinystring v0.1.32
-	github.com/cdvelop/tinytime v0.0.2
+	github.com/cdvelop/tinytime v0.0.3
 )
