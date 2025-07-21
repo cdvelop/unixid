@@ -143,7 +143,7 @@ func configCheck(c *Config) (*UnixID, error) {
 
 	// Aseguramos que syncMutex no sea nil (debería estar configurado en createUnixID)
 	if c.syncMutex == nil {
-		return nil, Err(D.Required, D.Sync, D.Mutex)
+		return nil, Err(D.Required, D.Sync, "Mutex")
 	}
 
 	return &UnixID{
