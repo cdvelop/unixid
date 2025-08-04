@@ -1,6 +1,6 @@
-github.com/cdvelop/tinyreflect v0.0.34 h1:A3kY0WAfQFHrXFbDYCN0I8feKJ9cOownR1+XeqilLKg=
-github.com/cdvelop/tinyreflect v0.0.34/go.mod h1:PqUylgRCAkEEI4fgpz/aK2TFC/39ZlTtQAUoLOueofE=
-github.com/cdvelop/tinystring v0.1.55 h1:hrjL8qSw60k/ba4FBr46x21S9eFtOYH7U4rniFuWG7U=
-github.com/cdvelop/tinystring v0.1.55/go.mod h1:85ltrACJtjf1Zu/o8kqwHGKAiN0oBwb+TR2tkXdURJo=
-github.com/cdvelop/tinytime v0.0.4 h1:+r5S/KULyI1hlHgjMcJd//VxYMrZZfHNI9jiFbzH9GQ=
-github.com/cdvelop/tinytime v0.0.4/go.mod h1:cCx07UN8DgMaiMw10ar5sp8EuoZ/V6ErMup1aZNTrjk=
+github.com/cdvelop/tinyreflect v0.0.35 h1:uMq67guE9IJ8ApFFVUBBErDNAuxlv4wo2tkUnRPItZE=
+github.com/cdvelop/tinyreflect v0.0.35/go.mod h1:Dk3sIvirAJbP9dmk9I3n/DRpXvgL5/32XtsgyWFmvE8=
+github.com/cdvelop/tinystring v0.1.56 h1:QbFYnYY9LXH6PhAmMTS4mR12IJXj4BYv3XQqWpvwhm4=
+github.com/cdvelop/tinystring v0.1.56/go.mod h1:85ltrACJtjf1Zu/o8kqwHGKAiN0oBwb+TR2tkXdURJo=
+github.com/cdvelop/tinytime v0.0.5 h1:C73JNBqlEV8ZSyKOpbxpwwQgPXtBcCi5ZnDt9/+QQEw=
+github.com/cdvelop/tinytime v0.0.5/go.mod h1:Z6YzcQ1f0ei1nrr4Vim5j5CMk49AlG1tR6giYyWmIOQ=
