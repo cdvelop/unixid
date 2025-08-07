@@ -20,7 +20,7 @@ import . "github.com/cdvelop/tinystring"
 //   - FieldType("user", "idaddress") returns (true, false)
 func (u *UnixID) FieldType(tableName, fieldName string) (ID, PK bool) {
 	if len(fieldName) >= 2 {
-		key_name := Convert(fieldName).Low().String()
+		key_name := Convert(fieldName).ToLower().String()
 
 		if key_name[:2] != "id" {
 			return
