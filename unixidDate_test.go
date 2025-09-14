@@ -9,7 +9,7 @@ import (
 )
 
 func TestIdToDate(t *testing.T) {
-	now := time.Now()
+	now := time.Now().UTC()
 	now_nano := now.UnixNano()
 	now_expected := now.Format("2006-01-02 15:04")
 

@@ -1,8 +1,2 @@
-github.com/cdvelop/tinyreflect v0.0.43 h1:DPYYvauOyDxQF50ykIoAsg51p0n4VLQ9NpXvImWvI4s=
-github.com/cdvelop/tinyreflect v0.0.43/go.mod h1:IXU8KoTQuggw274WKLwFGiRRYLQhGUar4NroslW4Lys=
-github.com/cdvelop/tinystring v0.5.0 h1:Eyb+3MSh14jeLYKwbGdXZwD2G5oXzl6DiTKSo8DbWFc=
-github.com/cdvelop/tinystring v0.5.0/go.mod h1:85ltrACJtjf1Zu/o8kqwHGKAiN0oBwb+TR2tkXdURJo=
-github.com/cdvelop/tinytime v0.1.2 h1:oW/+jfNH+RbR4Z2DqNl5LUv91GptubaSlcb2u1l8JOc=
-github.com/cdvelop/tinytime v0.1.2/go.mod h1:n1vVC8qMfQd8YenX6QPfCka/adX9EQMhkO3dbE86gKU=
-github.com/cdvelop/wasmtest v0.0.6 h1:5Gj2QbyxMxkqrOEHau1c6YRuY5U74Xs/UyNnDc40hpc=
-github.com/cdvelop/wasmtest v0.0.6/go.mod h1:JLf/e8lVq5lO96GgJH6rencPvETusRYx5PBUNV8PmsY=
+github.com/cdvelop/wasmtest v0.0.9 h1:R17RYOaGEF+ji4x602C+BLL4Ha33PszV6Tz6D3odXTA=
+github.com/cdvelop/wasmtest v0.0.9/go.mod h1:JLf/e8lVq5lO96GgJH6rencPvETusRYx5PBUNV8PmsY=
