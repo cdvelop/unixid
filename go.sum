@@ -1,2 +1,6 @@
+github.com/cdvelop/tinyreflect v0.0.43 h1:DPYYvauOyDxQF50ykIoAsg51p0n4VLQ9NpXvImWvI4s=
+github.com/cdvelop/tinyreflect v0.0.43/go.mod h1:IXU8KoTQuggw274WKLwFGiRRYLQhGUar4NroslW4Lys=
+github.com/cdvelop/tinytime v0.1.4 h1:BIh28l/slraT2kkIYjtoLxFFs+9FmP2frTNTEq4JqaA=
+github.com/cdvelop/tinytime v0.1.4/go.mod h1:N1JvbWasiGgipDVPwA0ysFldxwYehWliMkr+YZZaf2M=
 github.com/cdvelop/wasmtest v0.0.9 h1:R17RYOaGEF+ji4x602C+BLL4Ha33PszV6Tz6D3odXTA=
 github.com/cdvelop/wasmtest v0.0.9/go.mod h1:JLf/e8lVq5lO96GgJH6rencPvETusRYx5PBUNV8PmsY=
