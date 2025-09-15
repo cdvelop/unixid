@@ -7,5 +7,3 @@ require (
 	github.com/cdvelop/tinystring v0.7.0
 	github.com/cdvelop/tinytime v0.1.4
 )
-
-replace github.com/cdvelop/tinystring => ../tinystring

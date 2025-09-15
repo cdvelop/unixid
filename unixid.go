@@ -5,7 +5,6 @@ import (
 	"github.com/cdvelop/tinytime"
 )
 
-const prefixNameID = "id_"
 const sizeBuf = int32(19)
 
 // lockHandler represents a mutex-like locking mechanism for thread safety

@@ -244,6 +244,6 @@ UnixID automatically detects the compilation environment and configures itself a
 
 This automatic configuration allows you to use the same API in both environments while the library handles the implementation details internally.
 
-## License
-
-This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+## [Contributing](https://github.com/cdvelop/cdvelop/blob/main/CONTRIBUTING.md)
+---
+## [License](LICENSE)
