@@ -1,17 +1,17 @@
 package unixid
 
-import "github.com/cdvelop/tinyreflect"
+import "reflect"
 
 // SetNewID sets a new unique ID value to various types of targets.
 // It generates a new unique ID based on Unix nanosecond timestamp and assigns it to the provided target.
-// This function can work with multiple target types including tinyreflect.Value, string pointers, and byte slices.
+// This function can work with multiple target types including reflect.Value, string pointers, and byte slices.
 //
 // In WebAssembly environments, IDs include a user session number as a suffix (e.g., "1624397134562544800.42").
 // In server environments, IDs are just the timestamp (e.g., "1624397134562544800").
 //
 // Parameters:
 //   - target: The target to receive the new ID. Can be:
-//   - tinyreflect.Value or *tinyreflect.Value: For setting struct field values via tiny-reflection.
+//   - reflect.Value or *reflect.Value: For setting struct field values via reflection.
 //   - *string: For setting a string variable directly.
 //   - []byte: For appending the ID to a byte slice.
 //
@@ -19,10 +19,10 @@ import "github.com/cdvelop/tinyreflect"
 //
 // Examples:
 //
-//	// Setting a struct field using tiny-reflection
-//	v := tinyreflect.ValueOf(&myStruct)
-//	elem, _ := v.Elem()
-//	field, _ := elem.Field(0) // Get field by index
+//	// Setting a struct field using reflection
+//	v := reflect.ValueOf(&myStruct)
+//	elem := v.Elem()
+//	field := elem.Field(0) // Get field by index
 //	idHandler.SetNewID(field)
 //
 //	// Setting a string variable
@@ -38,12 +38,16 @@ func (id *UnixID) SetNewID(target any) {
 
 	// Set the ID to the appropriate target type
 	switch t := target.(type) {
-	case tinyreflect.Value:
+	case reflect.Value:
 		// For struct fields via reflection
-		t.SetString(newID)
-	case *tinyreflect.Value:
+		if t.CanSet() {
+			t.SetString(newID)
+		}
+	case *reflect.Value:
 		// For struct fields via reflection (pointer)
-		t.SetString(newID)
+		if t.CanSet() {
+			t.SetString(newID)
+		}
 	case *string:
 		// For string variables
 		*t = newID

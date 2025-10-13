@@ -1,9 +1,9 @@
 package unixid_test
 
 import (
+	"reflect"
 	"testing"
 
-	"github.com/cdvelop/tinyreflect"
 	. "github.com/cdvelop/tinystring"
 	"github.com/cdvelop/unixid"
 )
@@ -42,20 +42,14 @@ func TestSetNewID(t *testing.T) {
 		}
 	})
 
-	t.Run("SetNewID con tinyreflect.Value", func(t *testing.T) {
+	t.Run("SetNewID con reflect.Value", func(t *testing.T) {
 		// Creamos una estructura para prueba
 		testObj := TestStruct{}
 
-		// Obtenemos el campo ID usando tinyreflect
-		v := tinyreflect.ValueOf(&testObj)
-		elem, err := v.Elem()
-		if err != nil {
-			t.Fatalf("Elem() failed: %v", err)
-		}
-		field, err := elem.Field(0) // ID es el primer campo (índice 0)
-		if err != nil {
-			t.Fatalf("Field(0) failed: %v", err)
-		}
+		// Obtenemos el campo ID usando reflect
+		v := reflect.ValueOf(&testObj)
+		elem := v.Elem()
+		field := elem.Field(0) // ID es el primer campo (índice 0)
 		uid.SetNewID(field)
 
 		if testObj.ID == "" {
@@ -68,20 +62,14 @@ func TestSetNewID(t *testing.T) {
 		}
 	})
 
-	t.Run("SetNewID con *tinyreflect.Value", func(t *testing.T) {
+	t.Run("SetNewID con *reflect.Value", func(t *testing.T) {
 		// Creamos una estructura para prueba
 		testObj := TestStruct{}
 
-		// Obtenemos el campo ID usando tinyreflect
-		v := tinyreflect.ValueOf(&testObj)
-		elem, err := v.Elem()
-		if err != nil {
-			t.Fatalf("Elem() failed: %v", err)
-		}
-		field, err := elem.Field(0) // ID es el primer campo (índice 0)
-		if err != nil {
-			t.Fatalf("Field(0) failed: %v", err)
-		}
+		// Obtenemos el campo ID usando reflect
+		v := reflect.ValueOf(&testObj)
+		elem := v.Elem()
+		field := elem.Field(0) // ID es el primer campo (índice 0)
 		uid.SetNewID(&field) // Pasamos un puntero a la Value
 
 		if testObj.ID == "" {

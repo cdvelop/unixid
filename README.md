@@ -161,7 +161,7 @@ This behavior assumes that external synchronization is being properly handled by
   - In WebAssembly builds, appends a user session number to the timestamp
 
 - `SetNewID(target any)`: Sets a new unique ID to various target types
-  - Accepts pointers to string, tinyreflect.Value, or byte slices
+  - Accepts pointers to string, reflect.Value, or byte slices
   - Thread-safe in server environments
   - Example usages:
     ```go
