@@ -1,7 +1,7 @@
 package unixid__test
 
 import (
-	. "github.com/tinywasm/unixid"
+	. "webtyp.com/unixid"
 	"testing"
 )
 

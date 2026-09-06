@@ -1,10 +1,10 @@
 package unixid__test
 
 import (
-	. "github.com/tinywasm/unixid"
+	. "webtyp.com/unixid"
 	"testing"
 
-	. "github.com/tinywasm/fmt"
+	. "webtyp.com/fmt"
 )
 
 func TestSetNewID(t *testing.T) {

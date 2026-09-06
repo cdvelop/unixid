@@ -1,7 +1,7 @@
 package unixid
 
 import (
-	. "github.com/tinywasm/fmt"
+	. "webtyp.com/fmt"
 )
 
 // Validate validates the format of an ID string without parsing it.

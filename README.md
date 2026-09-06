@@ -18,7 +18,7 @@ UnixID provides functionality for generating and managing unique identifiers wit
 ## Installation
 
 ```bash
-go get github.com/tinywasm/unixid
+go get webtyp.com/unixid
 ```
 
 ## Quick Start
@@ -29,7 +29,7 @@ go get github.com/tinywasm/unixid
 package main
 
 import (
-	"github.com/tinywasm/unixid"
+	"webtyp.com/unixid"
 )
 
 func main() {
@@ -83,7 +83,7 @@ package main
 import (
 	"fmt"
 	"sync"
-	"github.com/tinywasm/unixid"
+	"webtyp.com/unixid"
 	"github.com/someother/library"
 )
 
@@ -200,7 +200,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/tinywasm/unixid"
+	"webtyp.com/unixid"
 )
 
 func main() {
@@ -226,7 +226,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/tinywasm/unixid"
+	"webtyp.com/unixid"
 )
 
 func main() {
@@ -268,6 +268,6 @@ UnixID automatically detects the compilation environment and configures itself a
 
 This automatic configuration allows you to use the same API in both environments while the library handles the implementation details internally.
 
-## [Contributing](https://github.com/tinywasm/cdvelop/blob/main/CONTRIBUTING.md)
+## [Contributing](https://github.com/webtyp/cdvelop/blob/main/CONTRIBUTING.md)
 ---
 ## [License](LICENSE)

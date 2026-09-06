@@ -1,8 +1,8 @@
 package unixid
 
 import (
-	. "github.com/tinywasm/fmt"
-	"github.com/tinywasm/time"
+	. "webtyp.com/fmt"
+	"webtyp.com/time"
 )
 
 const sizeBuf = int32(19)
